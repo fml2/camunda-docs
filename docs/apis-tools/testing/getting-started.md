@@ -1,59 +1,83 @@
 ---
 id: getting-started
-title: Getting started
-description: "Integrate the Camunda Process Test library in your project."
+title: Camunda Process Test
+description: "Use the Camunda Process Test (CPT) Java library to test your BPMN processes and process applications."
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import PageDescription from '@site/src/components/PageDescription';
+
+<PageDescription />
+
+## About
 
 [Camunda Process Test](https://github.com/camunda/camunda/tree/main/testing/camunda-process-test-java) (CPT) is a Java library to test your BPMN processes and your process application.
 
-CPT is based on [JUnit 5](https://junit.org/junit5/) and [Testcontainers](https://java.testcontainers.org/). It provides a managed isolated runtime to execute your process tests on your local machine. The runtime uses the Camunda Docker images and includes the following components:
+CPT provides different runtimes to execute your process tests:
 
-- Camunda (Zeebe, Operate, Tasklist)
-- Connectors
-- Elasticsearch
+- [Testcontainers runtime](configuration.md#testcontainers-runtime) (default) - A managed runtime based on [Testcontainers](https://java.testcontainers.org/) and Docker.
+- [Remote runtime](configuration.md#remote-runtime) - Your own runtime, such as, [Camunda 8 Run](/self-managed/quickstart/developer-quickstart/c8run.md)
 
-:::warning Disclaimer
-For Camunda 8.6, CPT is in an [alpha version](/reference/alpha-features.md#alpha).
-
-For a full-featured testing library, take a look at [Zeebe Process Test](/apis-tools/java-client/zeebe-process-test.md).
+:::info Public API
+CPT is part of the Camunda 8 [public API](/reference/public-api.md) and is covered by our SemVer stability guarantees (except for alpha features). Breaking changes will not be introduced in minor or patch releases.
 :::
 
-:::note Limitations
-CPT is in an early stage. It doesn't contain all features, and it is not optimized yet. Be aware of the following limitations:
-
-- Slow test execution (~40 seconds per test case)
-- Only basic assertions
-
+:::note
+CPT is the successor to Zeebe Process Test (ZPT). Our previous testing
+library was removed in Camunda 8.10. See
+the [migration guide](/apis-tools/migration-manuals/migrate-to-camunda-process-test.md) on how to migrate your process
+tests.
 :::
 
 ## Prerequisites
 
-- Java 8+ / 17+ (for Spring SDK)
-- JUnit 5
-- A Docker-API compatible container runtime, such as Docker on Linux or Docker Desktop on Mac and Windows. If you have issues with your Docker runtime, have a look at the [Testcontainers documentation](https://java.testcontainers.org/supported_docker_environment/).
+- Java:
+  - For the Camunda Java client: 8+
+  - For the Camunda Spring Boot Starter: 17+
+- [JUnit 5](https://junit.org/junit5/)
+
+For the default [Testcontainers runtime](configuration.md#testcontainers-runtime):
+
+- A Docker-API compatible container runtime, such as Docker on Linux or Docker Desktop on Mac and Windows.
 
 ## Install
 
-We have two variations of CPT: for the [Spring SDK](/apis-tools/spring-zeebe-sdk/getting-started.md) and the [Zeebe Java client](/apis-tools/java-client/index.md). Choose the one depending on which library you use in your process application.
+CPT has two variants:
 
-Add the following dependency to your Maven project:
+- For the [Camunda Spring Boot Starter](/apis-tools/camunda-spring-boot-starter/getting-started.md)
+- For the [Camunda Java client](/apis-tools/java-client/getting-started.md)
 
-<Tabs groupId="client" defaultValue="spring-sdk" queryString values={
-[
-{label: 'Spring SDK', value: 'spring-sdk' },
+Choose the one depending on which library you use in your process application.
+
+<Tabs groupId="client" defaultValue="spring-sdk" queryString values={[
+{label: 'Camunda Spring Boot Starter', value: 'spring-sdk' },
 {label: 'Java client', value: 'java-client' }
-]
-}>
+]}>
 
 <TabItem value='spring-sdk'>
+
+Add the following dependency to your Maven project:
 
 ```xml
 <dependency>
   <groupId>io.camunda</groupId>
   <artifactId>camunda-process-test-spring</artifactId>
+  <version>${camunda.version}</version>
+  <scope>test</scope>
+</dependency>
+```
+
+### Spring Boot 3 support
+
+If you use the [dedicated Spring Boot 3 starter](/apis-tools/camunda-spring-boot-starter/getting-started.md#dedicated-spring-boot-3-and-4-modules) (`camunda-spring-boot-3-starter`),
+you must also use the dedicated Spring Boot 3 test artifact:
+
+```xml
+<dependency>
+  <groupId>io.camunda</groupId>
+  <artifactId>camunda-process-test-spring-boot-3</artifactId>
+  <version>${camunda.version}</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -62,10 +86,13 @@ Add the following dependency to your Maven project:
 
 <TabItem value='java-client'>
 
+Add the following dependency to your Maven project:
+
 ```xml
 <dependency>
   <groupId>io.camunda</groupId>
   <artifactId>camunda-process-test-java</artifactId>
+  <version>${camunda.version}</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -78,23 +105,21 @@ Add the following dependency to your Maven project:
 
 Create a new Java class with the following structure:
 
-<Tabs groupId="client" defaultValue="spring-sdk" queryString values={
-[
-{label: 'Spring SDK', value: 'spring-sdk' },
+<Tabs groupId="client" defaultValue="spring-sdk" queryString values={[
+{label: 'Camunda Spring Boot Starter', value: 'spring-sdk' },
 {label: 'Java client', value: 'java-client' }
-]
-}>
+]}>
 
 <TabItem value='spring-sdk'>
 
 ```java
 package com.example;
 
+import io.camunda.client.CamundaClient;
+import io.camunda.client.api.response.ProcessInstanceEvent;
 import io.camunda.process.test.api.CamundaAssert;
 import io.camunda.process.test.api.CamundaProcessTestContext;
 import io.camunda.process.test.api.CamundaSpringProcessTest;
-import io.camunda.zeebe.client.ZeebeClient;
-import io.camunda.zeebe.client.api.response.ProcessInstanceEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -103,19 +128,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 @CamundaSpringProcessTest
 public class MyProcessTest {
 
-    @Autowired private ZeebeClient client;
+    @Autowired private CamundaClient client;
     @Autowired private CamundaProcessTestContext processTestContext;
 
     @Test
-    void shouldCompleteProcessInstance() {
-        // given: the processes are deployed
+    void shouldCreateProcessInstance() {
+        // given process definition is deployed
 
         // when
         final ProcessInstanceEvent processInstance =
-                client.newCreateInstanceCommand().bpmnProcessId("my-process").latestVersion().send().join();
+            client
+                .newCreateInstanceCommand()
+                .bpmnProcessId("my-process")
+                .latestVersion()
+                .send()
+                .join();
 
         // then
-        CamundaAssert.assertThat(processInstance).isCompleted();
+        CamundaAssert.assertThat(processInstance).isActive();
     }
 }
 ```
@@ -123,9 +153,21 @@ public class MyProcessTest {
 - `@SpringBootTest` is the standard Spring annotation for tests.
 - `@CamundaSpringProcessTest` registers the Camunda test execution listener that starts and stops the test runtime.
 - `@Test` is the standard JUnit 5 annotation for a test case.
-- (_optional_) Inject a preconfigured `ZeebeClient` to interact with the Camunda runtime.
+- (_optional_) Inject a preconfigured `CamundaClient` to interact with the Camunda runtime.
 - (_optional_) Inject a `CamundaProcessTestContext` to interact with the test runtime.
 - (_optional_) Use `CamundaAssert` to verify the process instance state.
+
+The Spring test requires a Spring Boot process application in the same package. Usually, the process
+application [deploys the process resources](/apis-tools/camunda-spring-boot-starter/getting-started.md#deploy-process-models)
+using the annotation `@Deployment`.
+
+If you have no process application yet, you can add a minimal one inside the test class as follows:
+
+```java
+@SpringBootApplication
+@Deployment(resources = "classpath*:/bpmn/**/*.bpmn")
+static class TestProcessApplication {}
+```
 
 </TabItem>
 
@@ -134,38 +176,47 @@ public class MyProcessTest {
 ```java
 package com.example;
 
+import io.camunda.client.CamundaClient;
+import io.camunda.client.api.response.ProcessInstanceEvent;
 import io.camunda.process.test.api.CamundaAssert;
 import io.camunda.process.test.api.CamundaProcessTest;
 import io.camunda.process.test.api.CamundaProcessTestContext;
-import io.camunda.zeebe.client.ZeebeClient;
-import io.camunda.zeebe.client.api.response.ProcessInstanceEvent;
 import org.junit.jupiter.api.Test;
 
 @CamundaProcessTest
 public class MyProcessTest {
 
     // to be injected
-    private ZeebeClient client;
+    private CamundaClient client;
     private CamundaProcessTestContext processTestContext;
 
     @Test
-    void shouldCompleteProcessInstance() {
+    void shouldCreateProcessInstance() {
         // given
-        client.newDeployResourceCommand().addResourceFromClasspath("my-process.bpmn").send().join();
+        client
+            .newDeployResourceCommand()
+            .addResourceFromClasspath("my-process.bpmn")
+            .send()
+            .join();
 
         // when
         final ProcessInstanceEvent processInstance =
-                client.newCreateInstanceCommand().bpmnProcessId("my-process").latestVersion().send().join();
+            client
+                .newCreateInstanceCommand()
+                .bpmnProcessId("my-process")
+                .latestVersion()
+                .send()
+                .join();
 
         // then
-        CamundaAssert.assertThat(processInstance).isCompleted();
+        CamundaAssert.assertThat(processInstance).isActive();
     }
 }
 ```
 
 - `@CamundaProcessTest` registers the Camunda JUnit extension that starts and stops the test runtime.
 - `@Test` is the standard JUnit 5 annotation for a test case.
-- (_optional_) Get a preconfigured `ZeebeClient` injected to interact with the Camunda runtime.
+- (_optional_) Get a preconfigured `CamundaClient` injected to interact with the Camunda runtime.
 - (_optional_) Get a `CamundaProcessTestContext` injected to interact with the test runtime.
 - (_optional_) Use `CamundaAssert` to verify the process instance state.
 
@@ -173,114 +224,152 @@ public class MyProcessTest {
 
 </Tabs>
 
-Read more about `CamundaAssert` and the available assertions [here](assertions.md).
+:::tip Shared runtime
+If you use the same runtime configuration for all test classes, you can use
+a [shared runtime](configuration.md#shared-runtime) to speed up the test execution.
+:::
 
-## Configure the runtime
+### Deploy resources
 
-By default, the test runtime uses the Camunda Docker images in the same version as the test library. You can change the version or customize the runtime to your needs.
+You can deploy additional BPMN processes and other resources by adding the annotation `@TestDeployment` on the test
+class or the method. An annotation on the test method takes precedence over an annotation on the test class. The
+resources are loaded from the root classpath of the test.
 
-<Tabs groupId="client" defaultValue="spring-sdk" queryString values={
-[
-{label: 'Spring SDK', value: 'spring-sdk' },
+```java
+@Test
+@TestDeployment(resources = "my-process.bpmn")
+void shouldCreateProcessInstance() {
+  // the given resources are deployed before running the test
+}
+```
+
+## Test lifecycle
+
+CPT performs the following actions during the JUnit 5 lifecycle when running a test class:
+
+<Tabs groupId="client" defaultValue="spring-sdk" queryString values={[
+{label: 'Camunda Spring Boot Starter', value: 'spring-sdk' },
 {label: 'Java client', value: 'java-client' }
-]
-}>
+]}>
 
 <TabItem value='spring-sdk'>
 
-Set the following properties in your `application.yml` (or `application.properties`) to override the defaults:
+- `beforeAll` (test methods)
+  - Start the test runtime
+- `beforeEach` (test method)
+  - Inject the `CamundaClient`, the `CamundaProcessTestContext`, and the `TestScenarioRunner`
+  - Publish the client created event for the Spring Boot process application to trigger the deployment and start job
+    workers
+  - Deploy resources defined via `@TestDeployment`
+- `afterEach` (test method)
+  - Collect the data for the coverage report
+  - Print the created process instances if the test failed
+  - Close the client connections
+  - Publish the client closed event for the Spring Boot process application to stop job workers
+  - Reset the Camunda runtime clock (can be disabled in the [configuration](configuration.md#test-cleanup-settings))
+  - Delete all data in the Camunda runtime (can be disabled in the [configuration](configuration.md#test-cleanup-settings))
+- `afterAll` (test methods)
+  - Generate the coverage report
+  - Stop the test runtime
 
-```yaml
-io:
-  camunda:
-    process:
-      test:
-        # Change the version of the Camunda Docker image
-        camundaVersion: 8.6.0
-        # Change the Camunda Docker image
-        camunda-docker-image-name: camunda/camunda
-        # Set additional Camunda environment variables
-        camunda-env-vars:
-          env_1: value_1
-        # Expose addition Camunda ports
-        camundaExposedPorts:
-          - 4567
-        # Enable Connectors
-        connectors-enabled: true
-        # Change the Connectors Docker image
-        connectors-docker-image-name: camunda/connectors
-        # Change version of the Connectors Docker image
-        connectors-docker-image-version: 8.6.0
-        # Set additional Connectors environment variables
-        connectors-env-vars:
-          env_1: value_1
-        # Set Connectors secrets
-        connectors-secrets:
-          secret_1: value_1
+### Limitations
+
+CPT doesn't support Spring Boot process applications with `@PostConstruct` methods or a `CommandLineRunner`
+implementation. These methods are executed when the test class is initialized, but not before each test method.
+
+We recommend to use a minimal configuration for the test instead of the Spring Boot process application and invoke the
+`@PostConstruct` or `run()` methods manually before each test method.
+
+```java
+@SpringBootTest(classes = {TestProcessApplication.class})
+@CamundaSpringProcessTest
+public class ProcessTest {
+
+  @Autowired private CamundaClient client;
+
+  @BeforeEach
+  void invokeProcessApplication() throws Exception {
+    final Application springBootApplication = new Application();
+    springBootApplication.setCamundaClient(client);
+    // call the @PostConstruct methods
+    springBootApplication.afterStarted();
+    // call the CommandLineRunner method
+    springBootApplication.run();
+  }
+
+}
+```
+
+Minimal test configuration:
+
+```java
+// must be in a different package than the Spring Boot application
+package org.example.test;
+
+@SpringBootApplication(
+  // list all required packages for the process test, such as job workers
+  scanBasePackages = {"org.example.services", "org.example.workers"}
+)
+@Deployment(resources = "classpath*:/bpmn/**/*.bpmn")
+public class TestProcessApplication {}
 ```
 
 </TabItem>
 
 <TabItem value='java-client'>
 
-You can change the version by setting the following properties in a `/camunda-container-runtime.properties` file:
-
-```properties
-camunda.version=8.6.0
-elasticsearch.version=8.13.4
-```
-
-For more configuration options, you can register the JUnit extension manually and use the fluent builder to override the default:
-
-```java
-package com.example;
-
-import io.camunda.process.test.api.CamundaProcessTestExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
-
-// No annotation: @CamundaProcessTest
-public class MyProcessTest {
-
-    @RegisterExtension
-    private final CamundaProcessTestExtension extension =
-            new CamundaProcessTestExtension()
-                    // Change the version of the Camunda Docker image
-                    .withCamundaVersion("8.6.0")
-                    // Change the Zeebe Docker image
-                    .withZeebeDockerImageName("camunda/zeebe")
-                    // Set additional Zeebe environment variables
-                    .withZeebeEnv("env_1", "value_1")
-                    // Expose addition Zeebe ports
-                    .withZeebeExposedPort(4567)
-                    // Enable Connectors
-                    .withConnectorsEnabled(true)
-                    // Change the Connectors Docker image
-                    .withConnectorsDockerImageName("camunda/connectors")
-                    // Change version of the Connectors Docker image
-                    .withConnectorsDockerImageVersion("8.6.0")
-                    // Set additional Connectors environment variables
-                    .withConnectorsEnv("env_1", "value_1")
-                    // Set Connectors secrets
-                    .withConnectorsSecret("secret_1", "value_1");
-}
-```
+- `beforeAll` (test methods)
+  - Start the test runtime
+- `beforeEach` (test method)
+  - Inject the `CamundaClient`, the `CamundaProcessTestContext`, and the `TestScenarioRunner`
+  - Deploy resources defined via `@TestDeployment`
+- `afterEach` (test method)
+  - Collect the data for the coverage report
+  - Print the created process instances if the test failed
+  - Close the client connections
+  - Reset the Camunda runtime clock (can be disabled in the [configuration](configuration.md#test-cleanup-settings))
+  - Delete all data in the Camunda runtime (can be disabled in the [configuration](configuration.md#test-cleanup-settings))
+- `afterAll` (test methods)
+  - Generate the coverage report
+  - Stop the test runtime
 
 </TabItem>
 
 </Tabs>
 
-## Logging
+## Next steps
 
-The test runtime uses [SLF4J](https://www.slf4j.org/) as the logging framework. If needed, you can enable the logging for the following packages:
+Learn more about the following topics:
 
-- `io.camunda.process.test` - The test runtime
-- `tc.camunda` - The Camunda Docker container
-- `tc.connectors` - The Connectors Docker container
-- `tc.elasticsearch` - The Elasticsearch Docker container
-- `org.testcontainers` - The Testconainers framework
+- `CamundaAssert` and [assertions](assertions.md)
+- `CamundaProcessTestContext` and [utilities](utilities.md)
+- How to [configure the runtime](configuration.md)
+- How to [test AI agent processes](/components/agentic-orchestration/evaluate-agents/test-ai-agents.md)
+- Best practices for [writing process tests](/components/best-practices/development/testing-process-definitions.md)
 
-For most cases, the log level `warn` (warning) is sufficient.
+Refer to the [API documentation](https://javadoc.io/doc/io.camunda/camunda-process-test-java/latest/io/camunda/process/test/api/package-summary.html) for details.
 
 ## Examples
 
 Take a look at the example project on [GitHub](https://github.com/camunda/camunda/tree/main/testing/camunda-process-test-example). This demonstrates the usage of the library for a demo Spring Boot process application.
+
+## Process Test Coverage
+
+After a test run, CPT prints the coverage of your BPMN processes and DMN decision tables to the log and generates a
+detailed HTML and JSON report. You can use the report to identify untested paths in your processes and decision tables, and increase your test coverage.
+
+A link to the HTML report is printed in the log:
+
+```
+Coverage: io.camunda.InvoiceApprovalTest
+========================
+Process coverage:
+- Process_InvoiceApproval: 96%
+
+Decision coverage:
+- auto-approve-invoice: 20%
+
+ Coverage report: file:///my/home/projects/my-process-application/target/coverage-report/report.html
+```
+
+![An example process test coverage HTML report](assets/process-coverage-report.png)

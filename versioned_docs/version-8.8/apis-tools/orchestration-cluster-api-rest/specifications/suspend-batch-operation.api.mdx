@@ -1,0 +1,320 @@
+---
+id: suspend-batch-operation
+title: "Suspend Batch operation"
+description: "<MarkerStronglyConsistentExtension />"
+sidebar_label: "Suspend Batch operation"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: versioned_docs/version-8.8/apis-tools/orchestration-cluster-api-rest/specifications/orchestration-cluster-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MarkerStronglyConsistentExtension from "@site/src/mdx/MarkerStronglyConsistentExtension";
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Suspend Batch operation"}
+></Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/batch-operations/{batchOperationKey}/suspension"}
+  context={"endpoint"}
+></MethodEndpoint>
+
+<MarkerStronglyConsistentExtension />
+
+Suspends a running batch operation.
+This is done asynchronously, the progress can be tracked using the batch operation status endpoint (/batch-operations/\{batchOperationKey\}).
+
+<Heading id={"request"} as={"h2"} className={"openapi-tabs__heading"}>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails
+  parameters={[
+    {
+      name: "batchOperationKey",
+      in: "path",
+      required: true,
+      description: "The key (or operate legacy ID) of the batch operation.\n",
+      schema: {
+        format: "BatchOperationKey | uuid",
+        type: "string",
+        description: "System-generated key for an batch operation.",
+        example: "2251799813684321",
+        title: "BatchOperationKey",
+      },
+    },
+  ]}
+></ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{ content: { "application/json": {} }, required: false }}
+></RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{
+    "204": {
+      description: "The batch operation pause request was created.",
+      content: {},
+    },
+    "400": {
+      description: "The provided data is not valid.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "403": {
+      description: "Forbidden. The request is not allowed.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "404": {
+      description: "Not found. The batch operation was not found.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "500": {
+      description: "An internal error occurred while processing the request.\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "503": {
+      description:
+        "The service is currently unavailable. This may happen only on some requests where the system creates backpressure to prevent the server's compute resources from being exhausted, avoiding more severe failures. In this case, the title of the error object contains `RESOURCE_EXHAUSTED`. Clients are recommended to eventually retry those requests after a backoff period. You can learn more about the backpressure mechanism here: https://docs.camunda.io/docs/components/zeebe/technical-concepts/internal-processing/#handling-backpressure .\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+  }}
+></StatusCodes>

@@ -1,0 +1,568 @@
+---
+id: search-groups
+title: "Search groups"
+description: "<MarkerEventuallyConsistentExtension />"
+sidebar_label: "Search groups"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: versioned_docs/version-8.8/apis-tools/orchestration-cluster-api-rest/specifications/orchestration-cluster-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MarkerEventuallyConsistentExtension from "@site/src/mdx/MarkerEventuallyConsistentExtension";
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Search groups"}
+></Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/groups/search"}
+  context={"endpoint"}
+></MethodEndpoint>
+
+<MarkerEventuallyConsistentExtension />
+
+Search for groups based on given criteria.
+
+<Heading id={"request"} as={"h2"} className={"openapi-tabs__heading"}>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails parameters={undefined}></ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{
+    required: false,
+    content: {
+      "application/json": {
+        schema: {
+          description: "Group search request.",
+          allOf: [
+            {
+              type: "object",
+              properties: {
+                page: {
+                  description: "Pagination criteria.",
+                  allOf: [
+                    {
+                      description:
+                        "Pagination criteria. Can use offset-based pagination (from/limit) OR cursor-based pagination (after/before + limit), but not both.",
+                      oneOf: [
+                        {
+                          type: "object",
+                          title: "Offset-based pagination",
+                          properties: {
+                            from: {
+                              description:
+                                "The index of items to start searching from.",
+                              type: "integer",
+                              format: "int32",
+                              default: 0,
+                              minimum: 0,
+                            },
+                            limit: {
+                              description:
+                                "The maximum number of items to return in one request.",
+                              type: "integer",
+                              format: "int32",
+                              default: 100,
+                              minimum: 1,
+                            },
+                          },
+                        },
+                        {
+                          type: "object",
+                          title: "Cursor-based forward pagination",
+                          required: ["after"],
+                          properties: {
+                            after: {
+                              description:
+                                "Use the `endCursor` value from the previous response to fetch the next page of results.",
+                              allOf: [
+                                {
+                                  description:
+                                    "The end cursor in a search query result set.",
+                                  format: "base64",
+                                  type: "string",
+                                  example: "WzIyNTE3OTk4MTM2ODcxMDJd",
+                                  title: "EndCursor",
+                                },
+                              ],
+                            },
+                            limit: {
+                              description:
+                                "The maximum number of items to return in one request.",
+                              type: "integer",
+                              format: "int32",
+                              default: 100,
+                            },
+                          },
+                        },
+                        {
+                          type: "object",
+                          title: "Cursor-based backward pagination",
+                          required: ["before"],
+                          properties: {
+                            before: {
+                              description:
+                                "Use the `startCursor` value from the previous response to fetch the previous page of results.",
+                              allOf: [
+                                {
+                                  description:
+                                    "The start cursor in a search query result set.",
+                                  format: "base64",
+                                  type: "string",
+                                  example: "WzIyNTE3OTk4MTM2ODcxMDJd",
+                                  title: "StartCursor",
+                                },
+                              ],
+                            },
+                            limit: {
+                              description:
+                                "The maximum number of items to return in one request.",
+                              type: "integer",
+                              format: "int32",
+                              default: 100,
+                            },
+                          },
+                        },
+                      ],
+                      title: "SearchQueryPageRequest",
+                    },
+                  ],
+                  type: "object",
+                },
+              },
+              title: "SearchQueryRequest",
+            },
+          ],
+          type: "object",
+          properties: {
+            sort: {
+              description: "Sort field criteria.",
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  field: {
+                    description: "The field to sort by.",
+                    type: "string",
+                    enum: ["name", "groupId"],
+                  },
+                  order: {
+                    description:
+                      "The order in which to sort the related field.",
+                    type: "string",
+                    enum: ["ASC", "DESC"],
+                    default: "ASC",
+                    title: "SortOrderEnum",
+                  },
+                },
+                required: ["field"],
+                title: "GroupSearchQuerySortRequest",
+              },
+            },
+            filter: {
+              description: "The group search filters.",
+              allOf: [
+                {
+                  description: "Group filter request",
+                  type: "object",
+                  properties: {
+                    groupId: {
+                      description: "The group ID search filters.",
+                      allOf: [
+                        {
+                          description:
+                            "String property with full advanced search capabilities.",
+                          type: "object",
+                          oneOf: [
+                            {
+                              type: "string",
+                              title: "Exact match",
+                              description: "Matches the value exactly.",
+                            },
+                            {
+                              title: "Advanced filter",
+                              description: "Advanced string filter.",
+                              allOf: [
+                                {
+                                  title: "Advanced filter",
+                                  description: "Basic advanced string filter.",
+                                  type: "object",
+                                  properties: {
+                                    $eq: {
+                                      description:
+                                        "Checks for equality with the provided value.",
+                                      type: "string",
+                                    },
+                                    $neq: {
+                                      description:
+                                        "Checks for inequality with the provided value.",
+                                      type: "string",
+                                    },
+                                    $exists: {
+                                      description:
+                                        "Checks if the current property exists.",
+                                      type: "boolean",
+                                    },
+                                    $in: {
+                                      description:
+                                        "Checks if the property matches any of the provided values.",
+                                      type: "array",
+                                      items: { type: "string" },
+                                    },
+                                    $notIn: {
+                                      description:
+                                        "Checks if the property matches none of the provided values.",
+                                      type: "array",
+                                      items: { type: "string" },
+                                    },
+                                  },
+                                },
+                                {
+                                  type: "object",
+                                  properties: {
+                                    $like: {
+                                      type: "string",
+                                      description:
+                                        "Checks if the property matches the provided like value.\n\nSupported wildcard characters are:\n\n* `*`: matches zero, one, or multiple characters.\n* `?`: matches one, single character.\n\nWildcard characters can be escaped with backslash, for instance: `\\*`.\n",
+                                      title: "LikeFilter",
+                                    },
+                                  },
+                                },
+                              ],
+                            },
+                          ],
+                          title: "StringFilterProperty",
+                        },
+                      ],
+                    },
+                    name: {
+                      description: "The group name search filters.",
+                      type: "string",
+                    },
+                  },
+                  title: "GroupFilter",
+                },
+              ],
+            },
+          },
+          title: "GroupSearchQueryRequest",
+        },
+      },
+    },
+  }}
+></RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{
+    "200": {
+      description: "The groups search result.",
+      content: {
+        "application/json": {
+          schema: {
+            description: "Group search response.",
+            type: "object",
+            allOf: [
+              {
+                type: "object",
+                required: ["page"],
+                properties: {
+                  page: {
+                    description:
+                      "Pagination information about the search results.",
+                    allOf: [
+                      {
+                        description:
+                          "Pagination information about the search results.",
+                        type: "object",
+                        required: ["totalItems"],
+                        properties: {
+                          totalItems: {
+                            description: "Total items matching the criteria.",
+                            type: "integer",
+                            format: "int64",
+                            example: 1,
+                          },
+                          hasMoreTotalItems: {
+                            description:
+                              "Indicates if more results exist beyond the reported totalItems value. Due to system limitations, the totalItems value can be capped.\n",
+                            type: "boolean",
+                            example: false,
+                          },
+                          startCursor: {
+                            description:
+                              "The cursor value for getting the previous page of results. Use this in the `before` field of an ensuing request.",
+                            allOf: [
+                              {
+                                description:
+                                  "The start cursor in a search query result set.",
+                                format: "base64",
+                                type: "string",
+                                example: "WzIyNTE3OTk4MTM2ODcxMDJd",
+                                title: "StartCursor",
+                              },
+                            ],
+                          },
+                          endCursor: {
+                            description:
+                              "The cursor value for getting the next page of results. Use this in the `after` field of an ensuing request.",
+                            allOf: [
+                              {
+                                description:
+                                  "The end cursor in a search query result set.",
+                                format: "base64",
+                                type: "string",
+                                example: "WzIyNTE3OTk4MTM2ODcxMDJd",
+                                title: "EndCursor",
+                              },
+                            ],
+                          },
+                        },
+                        example: { totalItems: 1, hasMoreTotalItems: false },
+                        title: "SearchQueryPageResponse",
+                      },
+                    ],
+                  },
+                },
+                title: "SearchQueryResponse",
+              },
+            ],
+            properties: {
+              items: {
+                description: "The matching groups.",
+                type: "array",
+                items: {
+                  description: "Group search response item.",
+                  type: "object",
+                  properties: {
+                    name: { type: "string", description: "The group name." },
+                    groupId: { type: "string", description: "The group ID." },
+                    description: {
+                      type: "string",
+                      description: "The group description.",
+                    },
+                  },
+                  title: "GroupResult",
+                },
+              },
+            },
+            title: "GroupSearchQueryResult",
+          },
+        },
+      },
+    },
+    "400": {
+      description: "The provided data is not valid.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "401": {
+      description: "The request lacks valid authentication credentials.",
+      headers: { "WWW-Authenticate": { schema: { type: "string" } } },
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "403": {
+      description: "Forbidden. The request is not allowed.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "500": {
+      description: "An internal error occurred while processing the request.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+  }}
+></StatusCodes>

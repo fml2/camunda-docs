@@ -1,16 +1,23 @@
 ---
 id: supported-environments
 title: "Supported environments"
-description: "Find out where to run Camunda 8 components for SaaS and Self-Managed, including Optimize for both Camunda 8 and Camunda 7."
+description: "Learn which browsers, operating systems, clients, deployment options, and component requirements are tested and supported for compatibility with Camunda 8."
 ---
 
-The supported environments page lists browsers, operating systems, clients, deployment options, and component requirements, which are tested and supported for compatibility with Camunda 8.
+import PageDescription from '@site/src/components/PageDescription';
 
-**If the particular technology is not listed, we cannot resolve issues caused by the usage of that unlisted technology.**
+<PageDescription />
 
-You may [raise a feature request](/contact) that will be evaluated by our product teams to provide official support from Camunda, or you can make a [help request](/contact) to work with Consulting services.
+## About supported environments
 
-Recommendations are denoted with [recommended], however, other listed options are supported as well.
+**If a particular technology is not listed below, Camunda cannot resolve issues caused by its usage.**
+
+You can:
+
+- [Raise a feature request](/reference/contact.md) that will be evaluated by our product teams to provide official support from Camunda.
+- [Make a help request](/reference/contact.md) to work with Camunda consulting services.
+
+Recommendations are denoted with [recommended]. Other listed options are also supported.
 
 :::note Minimum versions
 The versions listed on this page are the minimum version required if appended with a `+`.
@@ -21,7 +28,7 @@ For example, 1.2+ means support for the minor version 2, and any higher minors (
 
 :::
 
-## Web Browser
+## Web browsers
 
 - Google Chrome latest [recommended]
 - Mozilla Firefox latest
@@ -30,37 +37,34 @@ For example, 1.2+ means support for the minor version 2, and any higher minors (
 ## Desktop Modeler
 
 - Windows 10 / 11
-- Mac OS 12 / 13 / 14
+- macOS 13 / 14 / 15 / 26
 - Ubuntu LTS (latest)
 
 ## Clients
 
 - **Zeebe Java Client**: OpenJDK 8+
-- **Zeebe Spring SDK**: OpenJDK 17+
-- **Zeebe Go Client**: Go 1.13+
-- **zbctl**: Windows, macOS, and Linux (latest)
 - **Connector SDK**: OpenJDK 17+
-- **Spring SDK**: Spring Boot 3.3.x (for the exact version, check the [version matrix](/apis-tools/spring-zeebe-sdk/getting-started.md#version-compatibility).)
-- **Helm CLI**: 3.14.x (for the exact version, check the [version matrix](https://helm.camunda.io/camunda-platform/version-matrix/).)
+- **Camunda Spring Boot Starter**: OpenJDK 17+, Spring Boot 3.5.x, 4.1.x
+- **Helm CLI**: v4.x is required for Camunda 8.10 (chart 15.x) and later. See [Helm 4](/self-managed/deployment/helm/operational-tasks/helm-v4.md) for details, and the [version matrix](https://helm.camunda.io/camunda-platform/version-matrix/) for minimum patch versions.
 
 ## Camunda 8 Self-Managed
 
-We recommend running Camunda 8 Self-Managed in a Kubernetes environment. We provide officially supported [Helm Charts](/self-managed/setup/overview.md) for this. Please follow the [Installation Guide](/self-managed/setup/overview.md) to learn more about installation possibilities.
+We recommend running Camunda 8 Self-Managed in a Kubernetes environment. We provide officially supported [Helm charts](/self-managed/setup/overview.md) for this. See the [installation guide](/self-managed/setup/overview.md) to learn more about the available installation options.
 
 ### Deployment options
 
-With the right configuration, Camunda 8 Self-Managed can be deployed on any [Certified Kubernetes](https://www.cncf.io/training/certification/software-conformance/#benefits) distribution (cloud or on-premise). However, we officially test and support a specific list of platforms.
+With the correct configuration, Camunda 8 Self-Managed can be deployed on any [Certified Kubernetes](https://www.cncf.io/training/certification/software-conformance/#benefits) distribution (cloud or on-premises), and is not tied to a specific Kubernetes version. The Helm chart supports the Kubernetes [official support cycle](https://kubernetes.io/releases/).
 
 The following are tested and supported deployment options for Kubernetes, Docker, and manual installation:
 
-- [Stock Kubernetes](/self-managed/setup/install.md)
-- [Cloud service providers](/self-managed/setup/install.md) [recommended]
-  - [Amazon EKS](/self-managed/setup/deploy/amazon/amazon-eks/amazon-eks.md)
-  - [Microsoft AKS](/self-managed/setup/deploy/azure/microsoft-aks.md)
-  - [Google GKE](/self-managed/setup/deploy/gcp/google-gke.md)
-- [Red Hat OpenShift](/self-managed/setup/deploy/openshift/redhat-openshift.md)
-- [Docker](/self-managed/setup/deploy/other/docker.md) (`linux/amd64`)
-- [Manual](/self-managed/setup/deploy/local/manual.md)
+- [Stock Kubernetes](/self-managed/deployment/helm/install/quick-install.md)
+- [Cloud service providers](/self-managed/deployment/helm/install/quick-install.md) [recommended]
+  - [Amazon EKS](/self-managed/deployment/helm/cloud-providers/amazon/amazon-eks/amazon-eks.md)
+  - [Microsoft AKS](/self-managed/deployment/helm/cloud-providers/azure/microsoft-aks/microsoft-aks.md)
+  - [Google GKE](/self-managed/deployment/helm/cloud-providers/gcp/google-gke.md)
+- [Red Hat OpenShift](/self-managed/deployment/helm/cloud-providers/openshift/redhat-openshift.md)
+- [Docker](/self-managed/deployment/docker/docker.md) (`linux/amd64`, `linux/arm64`)
+- [Manual](/self-managed/deployment/manual/install.md)
 
 :::note Helm chart compatibility
 Ensure the Camunda component versions are compatible with the Helm chart version as defined in the [matrix](https://helm.camunda.io/camunda-platform/version-matrix/).
@@ -70,82 +74,80 @@ Ensure the Camunda component versions are compatible with the Helm chart version
 
 The [sizing of a Camunda 8 installation](/components/best-practices/architecture/sizing-your-environment.md) depends on various influencing factors. Ensure to [determine these factors](../components/best-practices/architecture/sizing-your-environment.md#understanding-influencing-factors), and conduct [benchmarking](../components/best-practices/architecture/sizing-your-environment.md#running-experiments-and-benchmarks) to validate an appropriate environment size for your test, integration, or production environments.
 
-#### Volume performance
+### Persistent volumes
 
-As a minimum requirement, the persistent volumes for Zeebe should use volumes with an absolute minimum of 1,000 IOPS. **NFS or other types of network storage volumes are not supported.**
+Camunda supports different types of storage volumes, including block storage and network file systems (NFS).
 
-To ensure an appropriate sizing, [determine your influencing factors](../components/best-practices/architecture/sizing-your-environment.md#understanding-influencing-factors) (e.g., throughput), and conduct [benchmarking to validate an appropriate environment sizing](../components/best-practices/architecture/sizing-your-environment.md#running-experiments-and-benchmarks).
+For details on typical volume usage, refer to these examples:
 
-For details on typical volume type usage, refer to the following examples specific to cloud service providers:
+- [Amazon EKS](/self-managed/reference-architecture/kubernetes.md#amazon-eks-1)
+- [Microsoft AKS](/self-managed/reference-architecture/kubernetes.md#microsoft-aks)
+- [Google GKE](/self-managed/reference-architecture/kubernetes.md#google-gke)
 
-- [Amazon EKS](/self-managed/setup/deploy/amazon/amazon-eks/amazon-eks.md#volume-performance)
-- [Microsoft AKS](/self-managed/setup/deploy/azure/microsoft-aks.md#volume-performance)
-- [Google GKE](/self-managed/setup/deploy/gcp/google-gke.md#volume-performance)
+#### Network File Systems
+
+Camunda guarantees support for Amazon Elastic File System (EFS).
+
+If you want to use another NFS, it must meet these requirements:
+
+- Be POSIX-compliant.
+- Never reorder file operations.
+- Retry I/O operations across temporary network failures, instead of failing on timeout.
+- Do not surface network-related failures in the client process.
+- **Only one container may mount the disk in write mode at a time.** Two containers mounting the same disk in write mode could cause data corruption.
+
+#### Performance
+
+Regardless of the type, the network storage volumes you use must meet these requirements:
+
+- They must be capable of **at least 1,000 IOPS**.
+- The latency of write/msync operations must be in the **low single digit milliseconds** under normal conditions. Ideally, it's in the order of microseconds.
+- The p99 latency must be **lower than 300 milliseconds**.
+- They must be SSD-backed. HDD-backed volumes typically sustain only tens to a few hundred IOPS with multi-millisecond seek latency, well below the 1,000 IOPS minimum and single-digit-millisecond latency required for Zeebe, so they are not supported.
+
+### Helm charts version matrix
+
+Camunda Helm chart version `15.x.x` works with Camunda version `8.10.x` and requires the Helm v4 CLI. Check the [Helm chart version matrix](https://helm.camunda.io/camunda-platform/version-matrix/) for more details.
 
 ## Component requirements
 
-Requirements for the components can be seen below:
+Requirements for components are as follows:
 
-| Component   | Java version | Other requirements                                                                                                                                                                                                |
-| ----------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Zeebe       | OpenJDK 21+  | Elasticsearch 8.13+<br/>Amazon OpenSearch 2.9+ (requires use of [OpenSearch exporter](../self-managed/zeebe-deployment/exporters/opensearch-exporter.md))                                                         |
-| Operate     | OpenJDK 21+  | Elasticsearch 8.13+<br/>Amazon OpenSearch 2.9+                                                                                                                                                                    |
-| Tasklist    | OpenJDK 21+  | Elasticsearch 8.13+<br/>Amazon OpenSearch 2.9+                                                                                                                                                                    |
-| Identity    | OpenJDK 17+  | Keycloak 24.x, 25.x<br/>PostgreSQL 14.x, 15.x or Amazon Aurora PostgreSQL 13.x, 14.x, 15.x (required for [certain features](/self-managed/identity/deployment/configuration-variables.md#database-configuration)) |
-| Optimize    | OpenJDK 21+  | Elasticsearch 8.13+<br/>Amazon OpenSearch 2.9+                                                                                                                                                                    |
-| Connectors  | OpenJDK 21+  |                                                                                                                                                                                                                   |
-| Web Modeler | -            | PostgreSQL 13.x, 14.x, 15.x, 16.x or Amazon Aurora PostgreSQL 13.x, 14.x, 15.x, 16.x                                                                                                                              |
+| Component                                                  | Java version  | Other requirements                                                                                                                                                                                                                                                                                                                                   |
+| :--------------------------------------------------------- | :------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Orchestration Cluster (Zeebe, Operate, Tasklist, Identity) | OpenJDK 21–25 | <ul><li>Elasticsearch 9.4+</li><li>Elasticsearch 8.19+</li><li>OpenSearch 3.6+</li><li>OpenSearch 2.19+</li><li>For supported relational databases and versions when using an RDBMS (for example, as secondary storage), see the [RDBMS version support policy](/self-managed/concepts/databases/relational-db/rdbms-support-policy.md)</li></ul>    |
+| Optimize                                                   | OpenJDK 21–25 | <ul><li>Elasticsearch 9.4+</li><li>Elasticsearch 8.19+</li><li>OpenSearch 3.6+</li><li>OpenSearch 2.19+</li></ul>                                                                                                                                                                                                                                    |
+| Connectors                                                 | OpenJDK 21–25 | –                                                                                                                                                                                                                                                                                                                                                    |
+| Management Identity                                        | OpenJDK 17+   | <ul><li>Keycloak 26.x</li><li>PostgreSQL 14.x, 15.x, 16.x, 17.x (required for [certain features](/self-managed/components/management-identity/miscellaneous/configuration-variables.md#database-configuration)), or Amazon Aurora PostgreSQL 13.x, 14.x, 15.x, 16.x, 17.x</li><li>Oracle 19c</li><li>Microsoft SQL Server 2019, 2022, 2025</li></ul> |
+| Camunda Hub                                                | –             | <ul><li>Supported relational databases and versions are defined in the [RDBMS version support policy](/self-managed/concepts/databases/relational-db/rdbms-support-policy.md)</li></ul>                                                                                                                                                              |
+| Self-Managed Console                                       | –             | –                                                                                                                                                                                                                                                                                                                                                    |
 
-When running Elasticsearch, you must have the [appropriate Elasticsearch privileges](/self-managed/concepts/elasticsearch-privileges.md).
-
-When running Amazon OpenSearch 2.11 or higher, we do not support [OR1 instances](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/or1.html)
-due to the [limitation](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/or1.html#or1-considerations)
-for the index refresh interval. More information on configuring Amazon OpenSearch can be found [here](/self-managed/setup/guides/using-existing-opensearch.md).
-
-:::note Elasticsearch support
-Camunda 8 works with the [default distribution](https://www.elastic.co/downloads/elasticsearch) of Elasticsearch, which is available under the [Free or Gold+ Elastic license](https://www.elastic.co/pricing/faq/licensing#summary).
+:::info Optimize compatibility
+When running Optimize, make sure you use an [Elasticsearch exporter](/self-managed/components/orchestration-cluster/zeebe/exporters/elasticsearch-exporter.md) or [OpenSearch exporter](/self-managed/components/orchestration-cluster/zeebe/exporters/opensearch-exporter.md) version that is compatible with your Optimize version.
 :::
+
+:::info RDBMS support
+For a complete list of supported RDBMS versions, JDBC driver information (bundled vs. user-supplied), and component compatibility when using relational databases as secondary storage, see the [RDBMS support policy](/self-managed/concepts/databases/relational-db/rdbms-support-policy.md).
+:::
+
+### OpenSearch and Elasticsearch support
+
+- Camunda 8 supports both [Amazon OpenSearch](https://aws.amazon.com/opensearch-service) and the open-source [OpenSearch](https://opensearch.org/) distribution.
+- Due to a [limitation](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/or1.html#or1-considerations)
+  for the index refresh interval, [OR1 instances](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/or1.html) are not supported with Amazon OpenSearch. See [use Amazon OpenSearch Service with the Helm chart](/self-managed/deployment/helm/configure/database/using-external-opensearch.md).
+- When running Elasticsearch, you must have the [appropriate Elasticsearch privileges](/self-managed/concepts/databases/elasticsearch/elasticsearch-privileges.md).
+- Camunda 8 works with the Elasticsearch [default distribution](https://www.elastic.co/downloads/elasticsearch) available with the [Free or Gold+ Elastic license](https://www.elastic.co/pricing/faq/licensing#summary).
 
 ### Component version matrix
 
-This matrix shows which component versions work together:
+The following matrix shows which component versions work together. Components within the same column must share the same `minor` and `patch` version.
 
-| Design                | Automate    |                                                                            | Improve         |
-| --------------------- | ----------- | -------------------------------------------------------------------------- | --------------- |
-| Desktop Modeler 5.22+ | Zeebe 8.5.x | Operate 8.5.x Tasklist 8.5.x Identity 8.5.x Connectors 8.5.x Console 8.5.x | Optimize 8.5.x  |
-| Desktop Modeler 5.19+ | Zeebe 8.4.x | Operate 8.4.x Tasklist 8.4.x Identity 8.4.x Connectors 8.4.x               | Optimize 8.4.x  |
-| Desktop Modeler 5.16+ | Zeebe 8.3.x | Operate 8.3.x Tasklist 8.3.x Identity 8.3.x Connectors 8.3.x               | Optimize 8.3.x  |
-| Desktop Modeler 5.10+ | Zeebe 8.2.x | Operate 8.2.x Tasklist 8.2.x Identity 8.2.x Connectors 0.23.2              | Optimize 3.10.x |
-| Desktop Modeler 4.12+ | Zeebe 1.3.x | Operate 1.3.x Tasklist 1.3.x IAM 1.3.x                                     | Optimize 3.7.x  |
-| -                     | -           | -                                                                          | -               |
-| Web Modeler 8.5.x     | Zeebe 8.5.x | Operate 8.5.x Tasklist 8.5.x Identity 8.5.x Connectors 8.5.x Console 8.5.x | Optimize 8.5.x  |
-| Web Modeler 8.4.x     | Zeebe 8.4.x | Operate 8.4.x Tasklist 8.4.x Identity 8.4.x Connectors 8.4.x               | Optimize 8.4.x  |
-| Web Modeler 8.3.x     | Zeebe 8.3.x | Operate 8.3.x Tasklist 8.3.x Identity 8.3.x Connectors 8.3.x               | Optimize 8.3.x  |
-| Web Modeler 8.2.x     | Zeebe 8.2.x | Operate 8.2.x Tasklist 8.2.x Identity 8.2.x Connectors 0.23.2              | Optimize 3.10.x |
+For Helm-managed deployments, use the Helm chart [version matrix](https://helm.camunda.io/camunda-platform/version-matrix/) as the source of truth for the component versions bundled in a supported chart release. Do not manually override bundled component image tags unless a specific upgrade guide or release note instructs you to do so.
+
+| [Orchestration Cluster](../self-managed/reference-architecture/reference-architecture.md#orchestration-cluster) | [Management](../self-managed/reference-architecture/reference-architecture.md#web-modeler-and-console) | Design                                       |
+| --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------- |
+| Orchestration Cluster 8.9.x<br/>Connectors 8.9.x<br/>Optimize 8.9.x                                             | Management Identity 8.9.x                                                                              | Camunda Hub 8.10.x<br/>Desktop Modeler 5.46+ |
 
 :::note
-You can also use newer versions of Desktop and Web Modeler with older Zeebe versions.
+You can use newer versions of Desktop and Camunda Hub with older versions of the Orchestration Cluster.
 :::
-
-## form-js version matrix
-
-| Design                | form-js |
-| --------------------- | ------- |
-| Desktop Modeler 5.22+ | 1.7.x   |
-| Desktop Modeler 5.19+ | 1.6.x   |
-| Desktop Modeler 5.10+ | 0.14.x  |
-| Desktop Modeler 5.4+  | 0.8.x   |
-| Desktop Modeler 5.0+  | 0.2.x   |
-| Desktop Modeler 4.12+ | 0.1.x   |
-| Desktop Modeler 4.11+ | 0.1.x   |
-| Desktop Modeler 4.9+  | 0.1.x   |
-| Desktop Modeler 4.7+  | 0.0.1   |
-| -                     | -       |
-| Web Modeler 8.5.x     | 1.7.x   |
-| Web Modeler 8.4.x     | 1.6.x   |
-| Web Modeler 8.3.x     | 1.3.x   |
-| Web Modeler 8.2.x     | 0.14.x  |
-
-## Camunda 7 & Optimize version matrix
-
-See https://docs.camunda.org/enterprise/download/#camunda-optimize.

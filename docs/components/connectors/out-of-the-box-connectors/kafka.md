@@ -1,8 +1,8 @@
 ---
 id: kafka
-title: Kafka Connector
-sidebar_label: Kafka Connector
-description: The Kafka Producer Connector allows you to connect your BPMN service with Kafka. Learn how to create a Kafka Producer Connector and make it executable.
+title: Kafka connector
+sidebar_label: Kafka
+description: The Kafka Producer connector allows you to connect your BPMN service with Kafka. Learn how to create a Kafka Producer connector and make it executable.
 ---
 
 import Tabs from "@theme/Tabs";
@@ -10,31 +10,31 @@ import TabItem from "@theme/TabItem";
 
 <Tabs groupId="kafka" defaultValue="outbound" queryString values={
 [
-{label: 'Kafka Producer Connector', value: 'outbound' },
-{label: 'Kafka Consumer Connector', value: 'inbound' }
+{label: 'Kafka Producer connector', value: 'outbound' },
+{label: 'Kafka Consumer connector', value: 'inbound' }
 ]}>
 
 <TabItem value='outbound'>
 
-The **Kafka Producer Connector** is an outbound Connector that allows you to connect your BPMN service with [Apache Kafka](https://kafka.apache.org/) to produce messages.
+The **Kafka Producer connector** is an outbound connector that allows you to connect your BPMN service with [Apache Kafka](https://kafka.apache.org/) to produce messages.
 
 ## Prerequisites
 
-To use the **Kafka Producer Connector**, you must have a Kafka instance with a configured bootstrap server.
+To use the **Kafka Producer connector**, you must have a Kafka instance with a configured bootstrap server.
 
 :::note
-Use Camunda secrets to avoid exposing your sensitive data as plain text. To learn more, see [managing secrets](/components/console/manage-clusters/manage-secrets.md).
+Use secrets to avoid exposing your sensitive data as plain text. To learn more, see [managing secrets](/components/hub/organization/manage-clusters/manage-secrets.md).
 :::
 
-## Create a Kafka Producer Connector task
+## Create a Kafka Producer connector task
 
 import ConnectorTask from '../../../components/react-components/connector-task.md'
 
 <ConnectorTask/>
 
-## Make your Kafka Producer Connector for publishing messages executable
+## Make your Kafka Producer connector for publishing messages executable
 
-To make your **Kafka Producer Connector** for publishing messages executable, complete the following sections.
+To make your **Kafka Producer connector** for publishing messages executable, complete the following sections.
 
 ### Authentication
 
@@ -58,9 +58,9 @@ The [appendix](#appendix-and-faq) provides more information about:
 
 - [Kafka secure authentication](#what-mechanism-is-used-to-authenticate-against-kafka).
 - [Inline schema](#inline-schema) and [Schema registry](#schema-registry).
-- [Pre-configured producer configuration values](#what-are-default-kafka-producer-client-properties) for this Connector.
+- [Pre-configured producer configuration values](#what-are-default-kafka-producer-client-properties) for this connector.
 
-Additionally, to learn more about supported producer configurations, see the [official Kafka documentation](https://kafka.apache.org/documentation/#producerconfigs).
+Additionally, to learn more about supported producer configurations, see the [official Kafka documentation](https://kafka.apache.org/41/configuration/producer-configs/).
 
 :::
 
@@ -71,10 +71,10 @@ In the **Message** section, set the **Key** and the **Value** that will be sent 
 ## Schema strategies
 
 :::caution
-Use Schema strategies with caution, as this is an [alpha feature](/reference/alpha-features.md). Functionality may not be comprehensive and could change.
+Use Schema strategies with caution, as this is an [alpha feature](/components/early-access/alpha/alpha-features.md). Functionality may not be comprehensive and could change.
 :::
 
-This Connector supports different schema strategies, offering a compact, fast, and binary data exchange format for Kafka messages.
+This connector supports different schema strategies, offering a compact, fast, and binary data exchange format for Kafka messages.
 
 When using a schema strategy, each message is serialized according to a specific schema written in JSON format. This schema defines the Kafka message structure, ensuring the data conforms to a predefined format, and enables schema evolution strategies.
 
@@ -82,7 +82,7 @@ When using a schema strategy, each message is serialized according to a specific
 
 To learn more about Schema strategies, refer to the official documentation:
 
-- [Inline Avro serialization](https://kafka.apache.org/documentation/#serialization) and [official Apache Avro documentation](https://avro.apache.org/docs/).
+- [Inline Avro serialization](https://docs.confluent.io/platform/current/schema-registry/fundamentals/serdes-develop/serdes-avro.html) and [official Apache Avro documentation](https://avro.apache.org/docs/).
 - [Confluent Schema Registry](https://docs.confluent.io/platform/current/schema-registry/index.html) (Avro, and JSON schemas).
 
 :::
@@ -107,6 +107,12 @@ Select **Schema registry** to send messages with a schema registered in a schema
   - The **schema registry URL** in the **Kafka** section.
   - The **schema** itself (that defines the message structure) in the **Message** section.
   - The **credentials** for the schema registry (if required). Refer to the [Schema Registry documentation](https://docs.confluent.io/platform/current/schema-registry/sr-client-configs.html#basic-auth-credentials-source) for more information.
+
+:::info
+
+Currently, the Kafka connector supports only [Confluent Schema Registry](https://docs.confluent.io/platform/current/schema-registry/index.html). Other schema registry implementations are not supported at this time.
+
+:::
 
 ### Example Avro schema and data
 
@@ -153,9 +159,9 @@ The following is an example Avro schema and data:
   }
   ```
 
-## Kafka Producer Connector response
+## Kafka Producer connector response
 
-The **Kafka Producer Connector** returns metadata for a record that has been acknowledged by the Kafka instance.
+The **Kafka Producer connector** returns metadata for a record that has been acknowledged by the Kafka instance.
 
 The following fields are available in the `response` variable:
 
@@ -165,7 +171,7 @@ The following fields are available in the `response` variable:
 - `topic`: The topic name.
 
 :::info
-For more information on these fields, refer to the [official Kafka documentation](https://kafka.apache.org/documentation/#intro_concepts_and_terms).
+For more information on these fields, refer to the [official Kafka documentation](https://kafka.apache.org/41/getting-started/introduction/).
 :::
 
 You can use an output mapping to map the response:
@@ -183,7 +189,7 @@ You can use an output mapping to map the response:
 
 ### What mechanism is used to authenticate against Kafka?
 
-If the fields **Username** and **Password** are not empty, by default the **Kafka Producer Connector** enables the credentials-based SASL SSL authentication and the following properties are set:
+If the fields **Username** and **Password** are not empty, by default the **Kafka Producer connector** enables the credentials-based SASL SSL authentication and the following properties are set:
 
 ```
 sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule   required username='<Your Username>'   password='<Your Password>';
@@ -248,17 +254,17 @@ The following example sets a new client property `client.id` and overrides the S
 
 <TabItem value='inbound'>
 
-The **Kafka Consumer Connector** allows you to consume messages by subscribing to [Kafka](https://kafka.apache.org/) topics and mapping them to your BPMN processes as start or intermediate events.
+The **Kafka Consumer connector** allows you to consume messages by subscribing to [Kafka](https://kafka.apache.org/) topics and mapping them to your BPMN processes as start or intermediate events.
 
 ## Prerequisites
 
-To use the **Kafka Consumer Connector**, you must have a Kafka instance with a configured bootstrap server.
+To use the **Kafka Consumer connector**, you must have a Kafka instance with a configured bootstrap server.
 
 :::note
-Use Camunda secrets to avoid exposing your sensitive data as plain text. To learn more, see [managing secrets](/components/console/manage-clusters/manage-secrets.md).
+Use secrets to avoid exposing your sensitive data as plain text. To learn more, see [managing secrets](/components/hub/organization/manage-clusters/manage-secrets.md).
 :::
 
-## Create a Kafka Consumer Connector event
+## Create a Kafka Consumer connector event
 
 1. Add a **Start Event** or an **Intermediate Event** to your BPMN diagram to get started.
 2. Change its template to a Kafka Consumer.
@@ -266,9 +272,9 @@ Use Camunda secrets to avoid exposing your sensitive data as plain text. To lear
 4. Complete your BPMN diagram.
 5. Deploy the diagram to activate the Kafka consumer.
 
-## Configure your Kafka Consumer Connector
+## Configure your Kafka Consumer connector
 
-To make your **Kafka Consumer Connector** executable, fill in the required properties.
+To make your **Kafka Consumer connector** executable, fill in the required properties.
 
 ### Authentication
 
@@ -276,7 +282,7 @@ In the **Authentication** section, select the **Authentication type**. If you se
 
 :::note
 
-- Use Camunda secrets to avoid exposing your sensitive data as plain text. To learn more, see [managing secrets](/components/console/manage-clusters/manage-secrets.md).
+- Use secrets to avoid exposing your sensitive data as plain text. To learn more, see [managing secrets](/components/hub/organization/manage-clusters/manage-secrets.md).
 - To learn more about Kafka authentication, see [Kafka secure authentication](#what-mechanism-is-used-to-authenticate-against-kafka-1).
 
 :::
@@ -285,24 +291,56 @@ In the **Authentication** section, select the **Authentication type**. If you se
 
 In the **Kafka** section, you can configure the following properties:
 
+- **Consumer Group ID**: Set the consumer group ID for this connector. Always provide an explicit, stable value that identifies the logical consumer group (for example, `my-app-order-processor`). If you leave this field empty, the connector auto-generates an ID from its internal deduplication key. That generated ID can change across connector upgrades, including from 8.8 to 8.9, causing Kafka to treat the connector as a new consumer group and potentially replay already processed messages.
 - **Schema strategy**: Select the schema strategy for your messages.
   - Select **No schema**, **Inline schema** for Avro serialization.
   - Select **Schema registry** If you have a Confluent Schema Registry.
 - **Bootstrap servers**: Set the URL of the bootstrap server(s). If more than one server is required, use comma-separated values.
 - **Topic**: Set the topic name.
-- **Additional properties**: Set producer configuration values.
+- **Additional properties**: Set consumer configuration values.
 - **Offsets**: Set the offsets for the partition. The number of offsets specified should match the number of partitions on the current topic.
 - **Auto offset reset**: Set the strategy to use when there is no initial offset in Kafka or if the specified offsets do not exist on the server.
 
 :::info
 
-The [appendix](#appendix-and-faq-1) provides more information about [pre-configured consumer configuration values](#what-are-default-kafka-consumer-client-properties) for this Connector.
+The [appendix](#appendix-and-faq-1) provides more information about [pre-configured consumer configuration values](#what-are-default-kafka-consumer-client-properties) for this connector.
 
-Additionally, to learn more about supported producer configurations, see the [official Kafka documentation](https://kafka.apache.org/documentation/#consumerconfigs).
+Additionally, to learn more about supported consumer configurations, see the [official Kafka documentation](https://kafka.apache.org/41/configuration/consumer-configs/).
 
 :::
 
-#### Example Avro schema and data
+### Schema strategy
+
+#### No schema
+
+Select **No schema** to send messages without a schema. This option is suitable for simple messages that don’t require a schema.
+
+#### Inline schema
+
+Select **Inline schema** to send messages with an **Avro schema**.
+
+- This option is appropriate for messages that require a schema but are not (or do not need to be) registered in a schema registry.
+- Enter the Avro schema that defines the message structure into the **Schema** field in the **Message** section.
+
+#### Schema registry
+
+Select **Schema registry** to send messages using a schema registered in a schema registry.
+
+- This option is appropriate for messages that require a schema and are registered in a [schema registry](https://docs.confluent.io/platform/current/schema-registry/index.html).
+- You must provide:
+  - The **schema registry URL** in the **Kafka** section.
+  - The **schema** itself (defining the message structure) in the **Message** section.
+  - The **credentials** for the schema registry, if required. See the [Schema Registry documentation](https://docs.confluent.io/platform/current/schema-registry/sr-client-configs.html#basic-auth-credentials-source) for more details.
+
+:::info
+
+Currently, the Kafka connector supports only the [Confluent Schema Registry](https://docs.confluent.io/platform/current/schema-registry/index.html). Other schema registry implementations are not supported at this time.
+
+Schema configuration is required only for the outbound connector. It is not required when using Inbound Connectors.
+
+:::
+
+### Example Avro schema and data
 
 If the expected Kafka message looks like this:
 
@@ -349,12 +387,12 @@ This schema defines a structure for a record that includes a name (string), an a
 
 ### Activation condition
 
-**Activation condition** is an optional FEEL expression field that allows for the fine-tuning of the Connector activation. This condition filters if the process step triggers when a Kafka message is consumed.
+**Activation condition** is an optional FEEL expression field that allows for the fine-tuning of the connector activation. This condition filters if the process step triggers when a Kafka message is consumed.
 
 For example, `=(value.itemId = "a4f6j2")` only triggers the start event or continues the catch event if the Kafka message has a matching itemId in the incoming message payload. Leave this field empty to trigger your process every time.
 
-:::warning
-By default, this Connector does not commit the offset if the message cannot be processed. This includes cases where the activation condition is not met.
+:::danger
+By default, this connector does not commit the offset if the message cannot be processed. This includes cases where the activation condition is not met.
 This means that if there is a message in the topic that cannot be processed due to an activation condition mismatch, the Kafka subscription will be stopped.
 
 Follow the steps below to configure this behavior.
@@ -364,23 +402,23 @@ To ignore messages that do not meet the activation condition and commit the offs
 
 | **Consume unmatched events** checkbox | Activation condition | Outcome                                              |
 | ------------------------------------- | -------------------- | ---------------------------------------------------- |
-| Checked                               | Matched              | Connector is triggered, offsets are commited         |
-| Unchecked                             | Matched              | Connector is triggered, offsets are commited         |
-| Checked                               | Unmatched            | Connector is not triggered, offsets are commited     |
-| Unchecked                             | Unmatched            | Connector is not triggered, offsets are not commited |
+| Checked                               | Matched              | connector is triggered, offsets are commited         |
+| Unchecked                             | Matched              | connector is triggered, offsets are commited         |
+| Checked                               | Unmatched            | connector is not triggered, offsets are commited     |
+| Unchecked                             | Unmatched            | connector is not triggered, offsets are not commited |
 
 ### Correlation
 
 The **Correlation** section allows you to configure the message correlation parameters.
 
 :::note
-The **Correlation** section is not applicable for the plain **start event** element template of the Kafka Connector. Plain **start events** are triggered by process instance creation and do not rely on message correlation.
+The **Correlation** section is not applicable for the plain **start event** element template of the Kafka connector. Plain **start events** are triggered by process instance creation and do not rely on message correlation.
 :::
 
 #### Correlation key
 
 - **Correlation key (process)** is a FEEL expression that defines the correlation key for the subscription. This corresponds to the **Correlation key** property of a regular **message intermediate catch event**.
-- **Correlation key (payload)** is a FEEL expression used to extract the correlation key from the incoming message. This expression is evaluated in the Connector Runtime and the result is used to correlate the message.
+- **Correlation key (payload)** is a FEEL expression used to extract the correlation key from the incoming message. This expression is evaluated in the connector Runtime and the result is used to correlate the message.
 
 For example, given that your correlation key is defined with `myCorrelationKey` process variable, and the incoming Kafka message contains `value:{correlationKey:myValue}`, your correlation key settings would be as follows:
 
@@ -396,7 +434,7 @@ To learn more about correlation keys, see [messages](../../../concepts/messages)
 #### Message ID expression
 
 The **Message ID expression** is an optional field that allows you to extract the message ID from the incoming message. The message ID serves as a unique identifier for the message and is used for message correlation.
-This expression is evaluated in the Connector Runtime and the result is used to correlate the message.
+This expression is evaluated in the connector Runtime and the result is used to correlate the message.
 
 In most cases, it is not necessary to configure the **Message ID expression**. However, it is useful if you want to ensure message deduplication or achieve a certain message correlation behavior.
 
@@ -417,21 +455,21 @@ The value is specified as an ISO 8601 duration. For example, `PT1H` sets the TTL
 
 ### Deduplication
 
-The **Deduplication** section allows you to configure the Connector deduplication parameters.
+The **Deduplication** section allows you to configure the connector deduplication parameters.
 
-**Connector deduplication** is a mechanism in the Connector Runtime that determines how many Kafka subscriptions are created if there are multiple occurrences of the **Kafka Consumer Connector** in the BPMN diagram. This is not to be confused with **message deduplication**.
+**Connector deduplication** is a mechanism in the connector Runtime that determines how many Kafka subscriptions are created if there are multiple occurrences of the **Kafka Consumer connector** in the BPMN diagram. This is not to be confused with **message deduplication**.
 
-By default, the Connector runtime deduplicates Connectors based on properties, so that elements with the same subscription properties only result in one subscription.
+By default, the connector runtime deduplicates connectors based on properties, so that elements with the same subscription properties only result in one subscription.
 
 :::info
-To learn more about deduplication, see [deduplication](../use-connectors/inbound.md#connector-deduplication).
+To learn more about deduplication, see [deduplication](../advanced-topics/deduplication.md).
 :::
 
 To customize the deduplication behavior, select the **Manual mode** checkbox, and configure the custom deduplication ID.
 
 ### Output mapping
 
-The **Kafka Consumer Connector** returns the consumed message.
+The **Kafka Consumer connector** returns the consumed message.
 
 The following fields are available in the `response` variable:
 
@@ -450,7 +488,7 @@ You can use an output mapping to map the response:
 }
 ```
 
-## Activate the Kafka Consumer Connector by deploying your diagram
+## Activate the Kafka Consumer connector by deploying your diagram
 
 When you click the **Deploy** button, your Kafka Consumer is activated and starts consuming messages from the specified topic.
 
@@ -458,7 +496,7 @@ When you click the **Deploy** button, your Kafka Consumer is activated and start
 
 ### What mechanism is used to authenticate against Kafka?
 
-If you selected _Credentials_ as the **Authentication type** and the fields **Username** and **Password** are not empty, by default the **Kafka Consumer Connector** enables the credentials-based SASL SSL authentication, and sets the following properties:
+If you selected _Credentials_ as the **Authentication type** and the fields **Username** and **Password** are not empty, by default the **Kafka Consumer connector** enables the credentials-based SASL SSL authentication, and sets the following properties:
 
 ```
 sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule   required username='<Your Username>'   password='<Your Password>';
@@ -501,6 +539,10 @@ If any of the field is not populated, you must configure your security method fo
   enable.auto.commit=false
   ```
 
+:::caution
+The `group.id` value above is auto-generated when no explicit **Consumer Group ID** is configured in the connector. This generated ID is derived from the connector's internal deduplication key and can change across connector upgrades, including from 8.8 to 8.9. When the group ID changes, Kafka treats the connector as a new consumer group, which means committed offsets are not reused and messages may be replayed. To avoid this, always set an explicit **Consumer Group ID**. You can [look up existing consumer groups](https://docs.confluent.io/kafka/operations-tools/manage-consumer-groups.html#list-groups-and-view-offsets) to find the current group ID in use.
+:::
+
 ### What is the precedence of client properties loading?
 
 Properties loading consists of three steps:
@@ -523,17 +565,17 @@ The deserialized object structure:
 }
 ```
 
-### When is the offset committed? What happens if the Connector execution fails?
+### When is the offset committed? What happens if the connector execution fails?
 
 The following outcomes are possible:
 
-- If the Connector execution is successful and the **Activation condition** was met, the offset is committed.
+- If the connector execution is successful and the **Activation condition** was met, the offset is committed.
 - If the **Activation condition** was not met, the offset is also committed to prevent consuming the same message twice.
-- If the Connector execution fails due to an unexpected error (for example, Zeebe is unavailable), the offset is not committed.
+- If the connector execution fails due to an unexpected error (for example, Zeebe is unavailable), the offset is not committed.
 
-### What lifecycle does the Kafka Consumer Connector have?
+### What lifecycle does the Kafka Consumer connector have?
 
-The Kafka Consumer Connector is a long-running Connector that is activated when the process is deployed, and deactivated when the process is undeployed or overwritten by a new version.
+The Kafka Consumer connector is a long-running connector that is activated when the process is deployed, and deactivated when the process is undeployed or overwritten by a new version.
 
 </TabItem>
 

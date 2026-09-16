@@ -13,7 +13,7 @@ Task applications are the interface between humans and Camunda processes to orch
 
 ## What are task applications?
 
-Task applications are end-user applications that allow humans to perform work orchestrated with a process. A [user task](/components/modeler/bpmn/user-tasks/user-tasks.md/#user-task-forms) (also referred to as a **human task**) represents a single **work item** to be performed by an individual or a group. The jobs of a task application include:
+Task applications are end-user applications that allow humans to perform work orchestrated with a process. A [user task](/components/modeler/bpmn/user-tasks/user-tasks.md#user-task-forms) (for [human task orchestration](/guides/getting-started-orchestrate-human-tasks.md)) represents a single **work item** to be performed by an individual or a group, whether the preceding step ran automatically or an [AI agent](/reference/glossary.md#ai-agent) escalated it for human input. The jobs of a task application include:
 
 - Listing available tasks and allowing users to select a task to work on.
 - Providing filter and search options for users so they can more easily find the right next task to work on.
@@ -54,21 +54,21 @@ Learn more how to work with the task queue in the [Tasklist user guide](/compone
 
 #### Task details
 
-Task details are shown when a task is selected from the queue. A [form](/guides/utilizing-forms.md) is displayed as the task content, which must be filled out to complete the task.
+Task details are shown when a task is selected from the queue. A [form](/components/modeler/forms/utilizing-forms.md) is displayed as the task content, which must be filled out to complete the task.
 
 :::tip
 Typically, a task application utilizes forms to capture information from the user, to make a decision, to collect the results from a real-world task, or to provide task instructions to the user.
 
-However, a [user task](/components/modeler/bpmn/user-tasks/user-tasks.md/#user-task-forms) is not limited to forms. A user task could also represent navigating to an external desktop or web application, where a task is to be performed, such as updating a record in a CRM. You can even use them to track physical work or actions using sensors, IoT devices, or any interface that can talk to the web, by using the [APIs](/apis-tools/tasklist-api-rest/tasklist-api-rest-overview.md) or registering a [job worker](/components/concepts/job-workers.md) to the job type `io.camunda.zeebe:userTask` (compatible with [job worker-based user tasks](/components/modeler/bpmn/user-tasks/user-tasks.md) only).
+However, a [user task](/components/modeler/bpmn/user-tasks/user-tasks.md#user-task-forms) is not limited to forms. A user task could also represent navigating to an external desktop or web application, where a task is to be performed, such as updating a record in a CRM. You can even use them to track physical work or actions using sensors, IoT devices, or any interface that can talk to the web, by using the [Orchestration Cluster REST API](/apis-tools/orchestration-cluster-api-rest/orchestration-cluster-api-rest-overview.md).
 
-For these cases, utilize the flexible [custom form key](/components/modeler/web-modeler/advanced-modeling/form-linking.md/#custom-form-key).
+For these cases, utilize the flexible [custom form key](/components/hub/workspace/modeler/modeling/advanced-modeling/form-linking.md#custom-form-key).
 :::
 
 On the top of the form, a header shows the title of the task to work on, and the current assignee. Depending on the status of the assignment, a button allows you to assign the task to yourself or release it to the queue.
 
 At the bottom of the form there is a button with which you can complete the task.
 
-To the right of the task, you find additional information about the task, such as the [due date](/components/modeler/bpmn/user-tasks/user-tasks.md#scheduling) of the task, or the [user groups that can work on this task](/self-managed/concepts/access-control/user-task-access-restrictions.md).
+To the right of the task, you find additional information about the task, such as the [due date](/components/modeler/bpmn/user-tasks/user-tasks.md#scheduling) of the task, or the authorization data that controls who can work on the task.
 
 Potential extensions are dependent on your use case. You can consider adding more buttons to the bottom of the panel to indicate different task outcomes such as "approve" or "reject", or you could add a list of attachments to the right panel.
 
@@ -121,7 +121,7 @@ flowchart
     end
 ```
 
-The lifecycle of human tasks is mostly a generic issue. There is no need to model common aspects into all your processes, as this often makes models unreadable. Use Camunda task management features or implement your requirements in a generic way.
+The lifecycle of human task orchestration is mostly a generic issue. There is no need to model common aspects into all your processes, as this often makes models unreadable. Use Camunda task management features or implement your requirements in a generic way.
 
 Learn how to define and implement your task lifecycle on the [user task lifecycle](./02-user-task-lifecycle.md) page.
 
@@ -131,7 +131,7 @@ Every task can be assigned to either a group of people, or a specific individual
 
 <img src={TaskAssignmentImg} className={styles.noShadow} style={{width: 600}} alt="Task assignment in group and personal queues" />
 
-As a general rule, you should assign human tasks in your business process to groups of people instead of specific individuals. This avoids bottlenecks (such as high workloads on single individuals or employees being on sick leave) and can greatly improve your process performance.
+As a general rule, you should assign user tasks in your business process to groups of people instead of specific individuals. This avoids bottlenecks (such as high workloads on single individuals or employees being on sick leave) and can greatly improve your process performance.
 
 In the [XML of a user task](/components/modeler/bpmn/user-tasks/user-tasks.md#xml-representations), this is represented as follows:
 
@@ -148,14 +148,14 @@ Then, require individual members of that group to explicitly claim tasks before 
 
 Often, task applications support the collaborative work on tasks, generally done using **comments**. **Document management** is a common use case of task applications, allowing users to upload, manage, and review **attachments**. Task applications are also the right place to browse, reference, and manage **case management data**.
 
-Task applications are not limited to web applications to be worked on desktops. Camunda has been used successfully for the the development of omnichannel customer-facing applications, such as **mobile banking apps**, often via a **backend-for-frontend** implementation.
+Task applications are not limited to web applications to be worked on desktops. Camunda has been used successfully for the development of omnichannel customer-facing applications, such as **mobile banking apps**, often via a **backend-for-frontend** implementation.
 
 ## Next steps
 
 You learned the basic concepts of a task application. Your possible next steps are:
 
 - Learn how to [embed or customize Camunda Forms](/apis-tools/frontend-development/03-forms/01-introduction-to-forms.md) to render tailored forms that can be designed by business users.
-- Learn how to utilize [Camunda 8 APIs](/apis-tools/tasklist-api-rest/tasklist-api-rest-overview.md) to query and execute tasks in your task application, and to enrich it with process execution data.
+- Learn how to utilize the [Orchestration Cluster REST API](/apis-tools/orchestration-cluster-api-rest/orchestration-cluster-api-rest-overview.md) to query and execute tasks in your task application, and to enrich it with process execution data.
 
 <!--
 TODO Section to be added once pages are available

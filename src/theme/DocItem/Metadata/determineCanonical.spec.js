@@ -122,7 +122,7 @@ describe("determineCanonical", () => {
 
         expect(() => {
           determineCanonical(currentDoc, currentPlugin);
-        }).toThrowError("canonicalUrl does not exist: /docs/welcome.");
+        }).toThrow("canonicalUrl does not exist: /docs/welcome.");
       });
     });
   });
@@ -174,7 +174,7 @@ describe("determineCanonical", () => {
 
         expect(() => {
           determineCanonical(currentDoc, currentPlugin);
-        }).toThrowError(
+        }).toThrow(
           "canonicalId does not exist in latest version: components/components-overview."
         );
       });
@@ -185,7 +185,7 @@ describe("determineCanonical", () => {
     beforeEach(() => {
       currentDoc = aCurrentDoc({
         metadata: {
-          unversionedId: "components/components-overview",
+          id: "components/components-overview",
         },
       });
 
@@ -314,7 +314,7 @@ function aCurrentDoc(specs = {}) {
   return {
     frontMatter: {},
     metadata: {
-      unversionedId: "a/doc/id",
+      id: "a/doc/id",
     },
     ...specs,
   };

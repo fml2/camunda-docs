@@ -4,9 +4,13 @@ title: "Overview"
 description: "Interact with Zeebe clusters. Run user task state operations for Zeebe user tasks."
 ---
 
+:::warning
+The Zeebe REST API is **deprecated**. While it continues to function, new development should use the [Orchestration Cluster REST API](/apis-tools/orchestration-cluster-api-rest/orchestration-cluster-api-rest-overview.md). See the [migration guide](/apis-tools/migration-manuals/migrate-to-camunda-api.md) for details.
+:::
+
 ## Introduction
 
-The Zeebe REST API is a REST API designed to interact with the Zeebe process automation engine.
+The Zeebe REST API is a REST API designed to interact with the Zeebe workflow engine.
 
 :::note
 Ensure you [authenticate](./zeebe-api-rest-authentication.md) before accessing the Zeebe REST API.
@@ -14,13 +18,17 @@ Ensure you [authenticate](./zeebe-api-rest-authentication.md) before accessing t
 
 ## Context paths
 
-For SaaS: `https://${REGION}.zeebe.camunda.io:443/${CLUSTER_ID}/v1/`, and for Self-Managed installations: `http://localhost:8080/v1/`.
+### SaaS
 
-:::note
-Find your region and cluster id under **Connection information** in your client credentials (revealed when you click on your client under the **API** tab within your cluster).
+Find your **region Id** and **cluster Id** under **Connection information** in your client credentials (revealed when you click on your client under the **API** tab within your cluster).
 
-For Self-Managed, the host and port depend on your configuration. The context path mentioned here is the default for the Zeebe component.
-:::
+Example path: `https://${REGION}.api.camunda.io:443/${CLUSTER_ID}/v1/`
+
+### Self-Managed
+
+Use the host and path defined for your [Zeebe Gateway](/reference/glossary.md#zeebe-gateway). For Ingress and routing details, see the [configuration guide](/self-managed/deployment/helm/configure/ingress/ingress-setup.md). The path used here is the default.
+
+Example path: `http://localhost:8080/v1/`
 
 ## API Explorer
 

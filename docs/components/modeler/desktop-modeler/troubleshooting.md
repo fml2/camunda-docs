@@ -29,12 +29,18 @@ Depending on your operating system, you can find Desktop Modeler logs in differe
 %APPDATA%\camunda-modeler\logs
 ```
 
+Example:
+
+```plain
+C:\Users\Camunda\AppData\Roaming\camunda-modeler\logs
+```
+
 </TabItem>
 
 <TabItem value='macos'>
 
 ```plain
-~/Library/Logs/Camunda Modeler
+~/Library/Logs/camunda-modeler
 ```
 
 </TabItem>
@@ -50,29 +56,122 @@ Depending on your operating system, you can find Desktop Modeler logs in differe
 
 To produce logging output, you can also run Desktop Modeler from the command line.
 
-## I cannot connect to Zeebe
+## I cannot connect to an orchestration cluster {#i-cannot-connect-to-zeebe}
 
-You try to connect (i.e., to deploy) to a remote Zeebe instance, and Desktop Modeler tells you it "cannot find a running Zeebe."
+You try to connect (i.e., to deploy) to a remote orchestration cluster, and Desktop Modeler tells you it "Cannot connect to orchestration cluster."
 
-To resolve this issue, check if you can connect to Zeebe through another client, i.e., [`zbctl`](/apis-tools/community-clients/cli-client/index.md). If that works, [further debug your Zeebe connection](#debug-zeebe-connection-issues). If that does not work, resolve the [general connection issue](#resolve-a-general-zeebe-connection-issue) first.
+:::tip
+If you run against a Camunda 8 SaaS free-trial cluster, ensure it is [not paused](../../concepts/clusters.md#auto-pause).
+:::
+
+To resolve this issue, check if you can connect to Zeebe through another client, for example, community-supported [`zbctl`](https://github.com/camunda-community-hub/zeebe-client-go/blob/main/cmd/zbctl/zbctl.md). If that works, [further debug your Zeebe connection](#debug-zeebe-connection-issues). If that does not work, resolve the [general connection issue](#resolve-a-general-zeebe-connection-issue) first.
+
+Additionally, if authorizations are enabled, ensure that your [client](/components/admin/client.md) credentials have the required permissions. These differ from [user](/components/admin/user.md) credentials and are evaluated separately.
+
+## I cannot connect to a local orchestration cluster {#i-cannot-connect-to-local-zeebe}
+
+You try to connect (i.e., to deploy) to a local orchestration cluster, and Desktop Modeler tells you it "Cannot connect to orchestration cluster."
+
+Ensure your local orchestration cluster is running. If you don't have one installed, consider [Camunda 8 Run](/self-managed/quickstart/developer-quickstart/c8run.md), a lightweight all-in-one distribution.
+
+## Cannot connect to an orchestration cluster in a local network
+
+Use this guidance when Desktop Modeler cannot connect to an orchestration cluster running in your local network and shows a "Cannot connect to orchestration cluster" error.
+
+Verify that your operating system allows Desktop Modeler to access the local network.
+
+<Tabs groupId="os" default="windows" queryString values={[
+{ label: 'Windows', value: 'windows' },
+{ label: 'macOS', value: 'macos' }
+]}>
+
+<TabItem value="windows">
+
+Ensure your network is set to **Private** and that apps are allowed to communicate on private networks.  
+See [make a network public or private](https://support.microsoft.com/en-us/windows/essential-network-settings-and-tasks-in-windows-f21a9bbc-c582-55cd-35e0-73431160a1b9#ID0EFF).
+
+</TabItem>
+
+<TabItem value="macos">
+
+Ensure **Privacy & Security** settings allow Desktop Modeler to access your local network.  
+See [control access to your local network](https://support.apple.com/en-gb/guide/mac-help/mchla4f49138/mac).
+
+</TabItem>
+
+</Tabs>
+
+## How to configure a REST connection
+
+You try out [task testing](./task-testing.md) and Desktop Modeler tells you "Configure a REST connection to a Camunda 8 cluster."
+
+Some features of Desktop Modeler, such as task testing, require a REST connection to a Camunda 8 cluster. Orchestration clusters from version 8.6 support connections with gRPC or the newer [Orchestration Cluster REST API](../../../apis-tools/orchestration-cluster-api-rest/orchestration-cluster-api-rest-overview.md). Depending on the provided URL, the corresponding client will be used. Ensure you use the REST URL in your deployment configuration:
+
+- If you are using Camunda 8 SaaS clusters, create an [API client](../../hub/organization/manage-clusters/manage-api-clients.md) and use the value of `Camunda REST API`.
+- If you are using [Camunda 8 Run](../../../self-managed/quickstart/developer-quickstart/c8run.md), you should use the value of `Orchestration Cluster API`.
+
+:::tip
+Even if the URL starts with `http://`, it may still be a gRPC endpoint. Ensure you use the correct URL provided by your orchestration cluster.
+:::
 
 ## Resolve a general Zeebe connection issue
 
-You try to connect to Zeebe from both Desktop Modeler _and_ [`zbctl`](/apis-tools/community-clients/cli-client/index.md), and neither of them works. General connection failures can have a couple of reasons:
+You try to connect to Zeebe from both Desktop Modeler _and_ community-supported [`zbctl`](https://github.com/camunda-community-hub/zeebe-client-go/blob/main/cmd/zbctl/zbctl.md), and neither of them works. General connection failures can have a couple of reasons:
 
-### The (remote) Zeebe instance is not reachable
+### The (remote) orchestration cluster is not reachable {#the-remote-zeebe-instance-is-not-reachable}
 
 Ensure your computer has access to the (remote) network.
+
+:::tip
+If you run against a Camunda 8 SaaS free-trial cluster, ensure it is [not paused](../../concepts/clusters.md#auto-pause).
+:::
 
 ### The connection to Zeebe happens through a proxy
 
 [Inspect the connection](#how-can-i-get-details-about-a-secure-remote-connection) to understand if it can be established.
 
-Secure connections to Zeebe require [HTTP/2 over TLS with protocol negotiation via ALPN](/self-managed/operational-guides/troubleshooting/troubleshooting.md#zeebe-ingress-grpc). Ensure your proxy supports these features and does not forcefully downgrade the connection to HTTP/1.
+Secure connections to Zeebe require [HTTP/2 over TLS with protocol negotiation via ALPN](/self-managed/operational-guides/troubleshooting.md#zeebe-ingress-grpc). Ensure your proxy supports these features and does not forcefully downgrade the connection to HTTP/1.
+
+### The connection to Zeebe should not happen through a proxy
+
+If you are using a proxy but do not want to connect to Zeebe through it, exclude Zeebe from proxying by adding it to the `NO_PROXY` environment variable:
+
+<Tabs groupId="os" defaultValue="windows" queryString values={
+[
+{label: 'Windows', value: 'windows' },
+{label: 'macOS', value: 'macos' },
+{label: 'Linux', value: 'linux' }
+]
+}>
+
+<TabItem value='windows'>
+
+```plain
+set NO_PROXY=localhost,127.0.0.1,some.intranet.host && "Camunda Modeler.exe"
+```
+
+</TabItem>
+
+<TabItem value='macos'>
+
+```plain
+NO_PROXY=localhost,127.0.0.1,some.intranet.host camunda-modeler
+```
+
+</TabItem>
+
+<TabItem value='linux'>
+
+```plain
+NO_PROXY=localhost,127.0.0.1,some.intranet.host camunda-modeler
+```
+
+</TabItem>
+</Tabs>
 
 ## Debug Zeebe connection issues
 
-You can connect to Zeebe via [`zbctl`](/apis-tools/community-clients/cli-client/index.md) or another API client. However, connecting through Desktop Modeler fails.
+You can connect to Zeebe via community-supported [`zbctl`](https://github.com/camunda-community-hub/zeebe-client-go/blob/main/cmd/zbctl/zbctl.md) or another API client. However, connecting through Desktop Modeler fails.
 
 ### Secure connection to Zeebe fails
 
@@ -170,6 +269,18 @@ DEBUG=* ZEEBE_NODE_LOG_LEVEL=DEBUG GRPC_VERBOSITY=DEBUG GRPC_TRACE=all camunda-m
 
 </TabItem>
 </Tabs>
+
+## Desktop Modeler does not start on Ubuntu 24 / modern Linux
+
+Modern Linux operating systems introduce restrictions on user namespaces, a sandboxing (isolation) mechanism Modeler uses. You may see an error message when you start the application:
+
+```sh
+$ ./camunda-modeler
+[46193:1114/170934.837319:FATAL:setuid_sandbox_host.cc(163)] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that [...]/camunda-modeler-[...]-linux-x64/chrome-sandbox is owned by root and has mode 4755.
+zsh: trace trap (core dumped)  ./camunda-modeler
+```
+
+To remedy this, configure your system to allow sandboxing by [creating an AppArmor profile](https://github.com/camunda/camunda-modeler/issues/4695#issuecomment-2478458250), or review [this issue](https://github.com/camunda/camunda-modeler/issues/4695#issuecomment-2478581677) for an in-depth explanation of available options. If you don't have the necessary permissions to permit sandboxing, you may choose to disable the sandbox, though this is not recommended.
 
 ## Other questions?
 

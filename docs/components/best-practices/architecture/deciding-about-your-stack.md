@@ -1,17 +1,6 @@
 ---
 title: Deciding about your stack
-tags:
-  - Architecture
-  - Stack
-  - Database
-  - Application Server
-  - Spring Boot
-  - Maven
 ---
-
-:::caution Camunda 8
-This best practice targets Camunda 8. For Camunda 7, please refer to [Deciding about your Camunda 7 stack](../deciding-about-your-stack-c7/).
-:::
 
 Our greenfield stack recommendation is a result of extensive discussions and evaluations. While not the only option, it is a solid choice if there are no specific reasons to choose an alternative.
 
@@ -27,9 +16,9 @@ This architecture diagram illustrates the flow of requests from a user's browser
 
 - SaaS simplifies workflow engine integration.
 - Spring Boot is widely adopted for Java application development.
-- Flexible for both on-premise and cloud environments.
+- Flexible for both on-premises and cloud environments.
 
-Discover more in our [getting started guide for microservices orchestration](/guides/getting-started-orchestrate-microservices.md) or the [Spring Zeebe SDK instructions](../../../apis-tools/spring-zeebe-sdk/getting-started.md).
+Discover more in our [getting started guide using Spring](/guides/getting-started-example.md) or the [Camunda Spring Boot Starter instructions](../../../apis-tools/camunda-spring-boot-starter/getting-started.md).
 
 ### Set up the stack
 
@@ -39,13 +28,13 @@ For a Java-based setup using Camunda 8 SaaS and Spring Boot, use the following s
 
 If you're new to Camunda SaaS, check out our [getting started guide](/guides/introduction-to-camunda-8.md#getting-started) to set up your environment.
 
-After signing up, create a cluster by following [creating a cluster in Camunda 8](/guides/create-cluster.md), which provides step-by-step instructions on setting up a new cluster in the Camunda 8 environment.
+After signing up, create a cluster by following [creating a cluster in Camunda 8](/components/hub/organization/manage-clusters/create-cluster.md), which provides step-by-step instructions on setting up a new cluster in the Camunda 8 environment.
 
 #### Spring Boot
 
 Develop your own process solutions as [Spring Boot](https://spring.io/projects/spring-boot) applications. This involves setting up a new Spring Boot project, either manually or using tools like [Spring Initializr](https://start.spring.io/).
 
-Integrate the [Spring Zeebe SDK](../../../apis-tools/spring-zeebe-sdk/getting-started.md) into the Spring Boot project by adding necessary dependencies to the project’s `pom.xml` file, and configure the application to use Camunda services.
+Integrate the [Camunda Spring Boot Starter](../../../apis-tools/camunda-spring-boot-starter/getting-started.md) into the Spring Boot project by adding necessary dependencies to the project’s `pom.xml` file, and configure the application to use Camunda services.
 
 #### Maven
 
@@ -85,4 +74,8 @@ You can develop process solutions as described with Java above also in any other
 
 ### Run Camunda 8 Self-Managed
 
-Run Camunda 8 on your Kubernetes cluster. For local development, a [Docker Compose configuration is available](/self-managed/setup/deploy/other/docker.md), though not for production use. Learn more in the [deployment docs](/self-managed/setup/install.md).
+Run Camunda 8 on your Kubernetes cluster. For local development, a [Docker Compose configuration is available](/self-managed/deployment/docker/docker.md), though not for production use. Learn more in the [deployment docs](/self-managed/deployment/helm/install/quick-install.md).
+
+### Choose an LLM provider
+
+If your processes hand steps to [AI agents](/reference/glossary.md#ai-agent), the LLM provider becomes part of your stack decision. Weigh hosting, data sensitivity, and cost as described in [choosing the right LLM](/components/agentic-orchestration/choose-right-model-agentic.md). On Camunda 8 SaaS, you can also start with [Camunda-provided LLM](/components/agentic-orchestration/camunda-provided-llm.md) and run agents without setting up a provider account first.

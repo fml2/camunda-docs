@@ -1,0 +1,305 @@
+---
+id: get-authentication
+title: "Get current user"
+description: "<MarkerStronglyConsistentExtension />"
+sidebar_label: "Get current user"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "get api-method"
+info_path: versioned_docs/version-8.8/apis-tools/orchestration-cluster-api-rest/specifications/orchestration-cluster-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MarkerStronglyConsistentExtension from "@site/src/mdx/MarkerStronglyConsistentExtension";
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get current user"}
+></Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/authentication/me"}
+  context={"endpoint"}
+></MethodEndpoint>
+
+<MarkerStronglyConsistentExtension />
+
+Retrieves the current authenticated user.
+
+<ParamsDetails parameters={undefined}></ParamsDetails>
+
+<RequestSchema title={"Body"} body={undefined}></RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{
+    "200": {
+      description: "The current user is successfully returned.",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: [
+              "tenants",
+              "groups",
+              "roles",
+              "salesPlanType",
+              "c8Links",
+              "canLogout",
+            ],
+            properties: {
+              username: {
+                description: "The username of the user.",
+                allOf: [
+                  {
+                    example: "swillis",
+                    format: "Username",
+                    description: "The unique name of a user.",
+                    type: "string",
+                    title: "Username",
+                  },
+                ],
+                nullable: true,
+              },
+              displayName: {
+                description: "The display name of the user.",
+                type: "string",
+                example: "Samantha Willis",
+                nullable: true,
+              },
+              email: {
+                description: "The email of the user.",
+                type: "string",
+                example: "swillis@acme.com",
+                nullable: true,
+              },
+              authorizedComponents: {
+                description:
+                  "The web components the user is authorized to use.",
+                type: "array",
+                example: ["*"],
+                items: { type: "string" },
+              },
+              tenants: {
+                description: "The tenants the user is a member of.",
+                type: "array",
+                items: {
+                  description: "Tenant search response item.",
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      description: "The tenant name.",
+                      example: "Customer Service department",
+                    },
+                    tenantId: {
+                      example: "customer-service",
+                      description: "The unique identifier of the tenant.",
+                      format: "TenantId",
+                      type: "string",
+                      title: "TenantId",
+                    },
+                    description: {
+                      type: "string",
+                      description: "The tenant description.",
+                      example: "Customer Service department business processes",
+                    },
+                  },
+                  title: "TenantResult",
+                },
+              },
+              groups: {
+                description: "The groups assigned to the user.",
+                type: "array",
+                example: ["customer-service"],
+                items: { type: "string" },
+              },
+              roles: {
+                description: "The roles assigned to the user.",
+                type: "array",
+                example: ["frontline-support"],
+                items: { type: "string" },
+              },
+              salesPlanType: {
+                description: "The plan of the user.",
+                type: "string",
+                example: "",
+              },
+              c8Links: {
+                description: "The links to the components in the C8 stack.",
+                type: "object",
+                example: {},
+                additionalProperties: { type: "string" },
+              },
+              canLogout: {
+                description:
+                  "Flag for understanding if the user is able to perform logout.",
+                type: "boolean",
+              },
+            },
+            title: "CamundaUserResult",
+          },
+        },
+      },
+    },
+    "401": {
+      description: "The request lacks valid authentication credentials.",
+      headers: { "WWW-Authenticate": { schema: { type: "string" } } },
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "403": {
+      description: "Forbidden. The request is not allowed.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "500": {
+      description: "An internal error occurred while processing the request.\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+  }}
+></StatusCodes>

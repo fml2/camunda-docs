@@ -1,7 +1,7 @@
 ---
 id: timer-events
 title: "Timer events"
-description: "Timer events are events triggered by a defined timer."
+description: "Learn about events triggered by a timer, including timer start events, intermediate timer catch events, and interrupting/non-interrupting timer boundary events."
 ---
 
 Timer events are events triggered by a defined timer.
@@ -12,7 +12,7 @@ Timer events are events triggered by a defined timer.
 
 A process can have one or more timer start events (besides other types of start events). Each of the timer events must have either a time date or time cycle definition.
 
-When a process is deployed, it schedules a timer for each timer start event. Scheduled timers of the previous version of the process (based on the BPMN process id) are canceled.
+When a process is deployed, it schedules a timer for each timer start event. Scheduled timers of the previous version of the process (based on the BPMN process ID) are canceled.
 
 When a timer is triggered, a new process instance is created and the corresponding timer start event is activated.
 
@@ -36,6 +36,8 @@ only trigger a single time once the date is reached.
 
 Non-interrupting timer boundary events are often used to model notifications; for example, contacting support if the processing takes longer than an hour.
 
+Attached to an [ad-hoc sub-process](/components/modeler/bpmn/ad-hoc-subprocesses/ad-hoc-subprocesses.md) hosting an [AI agent](/reference/glossary.md#ai-agent), a timer boundary event lets the process interrupt or redirect a running agent that takes too long, one of the patterns described in [mixing agents with workflow patterns](/components/agentic-orchestration/design-architecture.md#mix-agents-with-workflow-patterns).
+
 ## Timers
 
 Timers must be defined by providing either a date, a duration, or a cycle.
@@ -58,6 +60,8 @@ Depending on how much load the system is under, timers could trigger later than 
 import ISO8601DateTime from '../assets/react-components/iso-8601-date-time.md'
 
 <ISO8601DateTime/>
+
+If the date is in the past at the time of deployment, the timer fires immediately.
 
 ### Time duration
 
@@ -96,6 +100,8 @@ It's possible to define a start time. By doing this, the timer triggers for the 
 
 - `R3/2022-04-27T17:20:00Z/P1D`: Every day up to three times, starting from April 27, 2022 at 5:20 p.m. UTC
 - `R/2022-01-01T10:00:00+02:00[Europe/Berlin]/P1D`: Every day infinitely, starting from January 1, 2022 at 10 a.m. UTC plus 2 hours
+
+If the start time is in the past at the time of deployment, the timer fires immediately upon deployment, and then continues with the regular interval from that point on.
 
 Additionally, you can specify a time cycle using cron expressions. Refer to the [CronExpression Tutorial](https://spring.io/blog/2020/11/10/new-in-spring-5-3-improved-cron-expressions) for additional information about using cron expressions.
 

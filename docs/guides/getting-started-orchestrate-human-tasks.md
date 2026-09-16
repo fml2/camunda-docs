@@ -1,19 +1,18 @@
 ---
 id: orchestrate-human-tasks
 title: Get started with human task orchestration
-sidebar_label: Get started with human task orchestration
-description: "Efficiently allocate work through user tasks."
+sidebar_label: Orchestrate human tasks
+description: "For low-code developers using Camunda 8 SaaS, efficiently allocate work through user tasks."
 keywords: [human tasks, orchestration, getting started, user guide]
 ---
 
 <span class="badge badge--beginner">Beginner</span>
-<span class="badge badge--medium">Time estimate: 15 minutes</span><br /><br />
+<span class="badge badge--medium">Time estimate: 15 minutes</span>
 
 import ExpressionInputImg from './img/expression-input-example.png';
 import FormValuesTop from './img/form-values-top.png';
 import FormValuesBottom from './img/form-values-bottom.png';
 import FormId from './img/form-id.png';
-import ImplementModeImg from './img/implement-mode-active.png';
 import FormLinkingImg from './img/form-linking.png';
 import ModelerNavImg from './img/modeler-navigation.png';
 import ModelerGlobalNavImg from './img/modeler-global-nav.png';
@@ -22,15 +21,16 @@ import RunProcessImg from './img/run-process.png';
 import RunProcessSM from './img/run-process-sm.png';
 import OperateHumanTasks from './img/operate-human-tasks.png';
 import FormEditorImg from './img/form-editor.png';
-import NavigationHistoryImg from './img/modeler-navigation-history.png';
 
 import clsx from "clsx";
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import SaasPrereqs from './react-components/saas-prerequisites.md'
-import Install from './react-components/install-c8run.md'
+import SaasPrereqs from './react-components/\_saas-prerequisites.md'
+import Install from './react-components/\_install-c8run.md'
 
-Camunda 8 allows you to orchestrate processes with human tasks of any complexity. Utilizing user tasks, you can create and assign tasks to users. Then, users can perform their work and enter the necessary data to drive the business process.
+This guide is designed for users who prefer a low-code approach to process automation. You can follow this tutorial using either a local, Self-Managed lightweight setup, or Camunda 8 SaaS.
+
+Camunda 8 allows you to orchestrate processes with human tasks of any complexity. Utilizing [user tasks](/reference/glossary.md#user-task), you can create and assign tasks to users. Then, users can perform their work and enter the necessary data to drive the business process.
 
 :::note
 If you prefer a video-based learning experience or a more complex example, visit [this Camunda Academy course](https://bit.ly/3PJJocB).
@@ -69,10 +69,11 @@ In this step, you will design a process that demonstrates how to route the proce
 <Tabs groupId="install" className="tabs-hidden">
 <TabItem value="saas">
 
-1. Every file in Web Modeler requires a project. Within Modeler, click **New project**.
-2. Name your project and select **Create new > BPMN diagram**.
-3. Give your file a descriptive name. In this case, name it `Decide for Dinner`.
-4. Make sure to name the process itself as well. Click the empty canvas, and specify the process name and technical ID in the properties panel. This specifies how the process will appear in other tools of Camunda 8.
+1. In Camunda Hub, navigate to your workspace.
+2. In the workspace, click **New project**.
+3. In your project, select **Create new > BPMN diagram**.
+4. Give your file a descriptive name. In this case, name it `Decide for Dinner`.
+5. Make sure to name the process itself as well. Click the empty canvas, and specify the process name and technical ID in the properties panel on the right side of the screen. This specifies how the process will appear in other tools of Camunda 8.
 
 </TabItem>
 <TabItem value="sm">
@@ -89,7 +90,6 @@ Within Desktop Modeler, select **BPMN diagram** under **Create a new file**.
 
 :::note
 To run this guide, make sure to be in **Implement** mode to specify the technical details of the process.
-<img src={ImplementModeImg} style={{width: 250}} alt="Active implement mode tab" />
 :::
 
 </TabItem>
@@ -101,7 +101,7 @@ To run this guide, make sure to be in **Implement** mode to specify the technica
 1. A **start event** is automatically added to the canvas. Click it to display configuration and append options.
 2. Click the rectangular **Append Task** icon to append a task.
 3. Enter a descriptive name for the task, such as `Decide what's for dinner`.
-4. Change the task type by clicking the **wrench** icon. Select **User Task**.
+4. Change the task type by clicking on the element and selecting the **Change element** menu icon. Select **User Task**.
 5. Select the user task and click on the diamond-shaped icon to append an exclusive gateway. The gateway allows to route the process flow differently, depending on conditions.
 6. Select the gateway and append a task by clicking the task icon. Repeat it to create a second process flow. Name the tasks based on what the user decides to eat: in this case, we've named ours `Prepare chicken` and `Prepare salad`.
 7. To route the user to the right task, add [expressions](/components/concepts/expressions.md) to the **sequence flows**. Sequence flows are represented by arrows connecting the gateway to the tasks. To add an expression, click on a sequence flow to view the **properties panel**, and open the **Condition** section.
@@ -179,8 +179,7 @@ Once the form is designed, you must link it to your process.
 <Tabs groupId="install" className="tabs-hidden">
 <TabItem value="saas">
 
-1. Click on the project name in the navigation history in the top bar to navigate back, and open the process you created in **[Step 1](#step-1-create-a-new-process)**.
-   <img src={NavigationHistoryImg} style={{width: 500}} alt="Navigation history in Web Modeler" />
+1. Navigate to the process you created in [Step 1](#step-1-create-a-new-process).
 2. Select the user task. Click the blue **form link icon** to open the form menu.
 3. Select the form you just created, and click **link** to confirm.
    <img src={FormLinkingImg} style={{width: 400}} alt="Selecting a form from the project" />
@@ -223,19 +222,19 @@ Human-centric processes involving user tasks seamlessly unfold within Tasklist, 
 2. After you deploy your process, it can be executed on the cluster. There are multiple ways to run a process. This time, click **Run** in Modeler for a test run.
 
 :::tip
-Other options to run a process are to start it via Tasklist, test it in the Play mode, or call it via the API or an inbound trigger. Read more about [run options](/components/modeler/web-modeler/run-or-publish-your-process.md).
+Other options to run a process are to start it via Tasklist, test it in the Test mode, or call it via the API or an inbound trigger. Read more about [run options](/components/hub/workspace/modeler/run-or-publish-your-process.md).
 :::
 
 </TabItem>
 <TabItem value="sm">
 
 :::note
-Ensure your installation of [Camunda 8 Run](/self-managed/setup/deploy/local/c8run.md) is running prior to deploying your process.
+Ensure your installation of [Camunda 8 Run](/self-managed/quickstart/developer-quickstart/c8run.md) is running prior to deploying your process.
 :::
 
 1. Click the rocket-shaped **Deploy** icon to begin deploying your process, and provide the following configuration:
    - **Target:** Self-Managed
-   - **Cluster endpoint:** `http://localhost:26500`, the location of your Zeebe Gateway
+   - **Cluster endpoint:** `http://localhost:8080/v2`
    - **Authentication:** None
 2. Click **Deploy** to deploy your process.
 3. To run your new process, click the arrow-shaped **Run** icon, and provide your form input as JSON (for example, `{"meal": "chicken"}`).
@@ -259,7 +258,7 @@ Ensure your installation of [Camunda 8 Run](/self-managed/setup/deploy/local/c8r
    <img src={OperateHumanTasks} alt="Process instance monitoring in Operate" />
 
 :::tip
-In production, Operate is used to monitor both long-running and straight-through, high-throughput processes. In development environments, use Operate to confirm if the process flow works as expected. For faster in-place validation during development, use the [Play mode](/components/modeler/web-modeler/play-your-process.md).
+In production, Operate is used to monitor both long-running and straight-through, high-throughput processes. In development environments, use Operate to confirm if the process flow works as expected. For faster in-place validation during development, use the [Test mode](/components/hub/workspace/modeler/validation/test-your-process.md).
 :::
 
 </TabItem>
@@ -317,7 +316,9 @@ In this case, the token will move through the gateway and (according to the cond
 
 At this point, you've successfully crafted a human-centered process that routes the process flow based on a decision made by a user.
 
-A core value of Camunda 8 lies in the combination of automation and human interaction. Continue with the following resources to learn about intelligent task assignments, flexible forms to capture data and decisions, operational insights to refine task efficiency, and pathways to publish your processes to users via Tasklist or even publicly.
+A core value of Camunda 8 lies in the combination of automation and human interaction. The same pattern applies when an [AI agent](/reference/glossary.md#ai-agent) produces the result a person acts on: the user task, form, and gateway you built here work the same way, whichever kind of step supplied the data.
+
+Continue with the [following resources](#additional-resources-and-next-steps) to learn about intelligent task assignments, flexible forms to capture data and decisions, operational insights to refine task efficiency, and pathways to publish your processes to users via Tasklist or even publicly.
 
 Don't want to build the process yourself? Click this button to create it from a template in Camunda 8 SaaS, or sign up first.
 
@@ -342,8 +343,8 @@ Don't want to build the process yourself? Click this button to create it from a 
 
 - Watch the [video-based Human Task Orchestration Course](https://bit.ly/3PJJocB).
 - Learn how to use [BPMN user tasks](/components/modeler/bpmn/user-tasks/user-tasks.md) to route tasks to the right users.
-- Learn how to [build more complex forms](./utilizing-forms.md) using the form editor.
+- Learn how to [build more complex forms](/components/modeler/forms/utilizing-forms.md) using the form editor.
 - Learn how to write powerful [expressions](/components/concepts/expressions.md) and utilize [variables](/components/concepts/variables.md) to route complex process flows.
 - Get an [introduction to Operate](/components/operate/operate-introduction.md).
 - Learn how to [set up Tasklist](/components/tasklist/introduction-to-tasklist.md) for efficient task management.
-- Explore [start forms](/components/modeler/web-modeler/advanced-modeling/publish-public-processes.md) and attach the form directly to the start event.
+- Explore start forms and attach the form directly to the start event for authenticated starts in Tasklist.

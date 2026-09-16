@@ -1,76 +1,243 @@
 ---
 id: backup-and-restore
-title: "Backup and restore"
-sidebar_label: "Backup and restore"
+sidebar_label: Back up and restore
+title: Camunda back up and restore
 keywords: ["backup", "backups"]
+description: "Learn how to back up and restore your Camunda 8 Self-Managed components."
 ---
 
-:::note
-This release introduces breaking changes for [Operate and Tasklist](./operate-tasklist-backup.md), as well as [Optimize](./optimize-backup.md).
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import ZeebeGrid from '../../../components/zeebe/react-components/\_zeebe-card';
+import { esCards, rdbmsCards } from './react-components/\_card-data';
+
+Use the backup feature to back up and restore your Camunda 8 Self-Managed components and cluster.
+
+:::tip Disaster recovery context
+If you are using backups as the foundation of a cross-region recovery strategy, see [Cold Recovery](../../concepts/multi-region/cold-recovery.md) for the architecture, RTO/RPO targets, and recovery flow. Cold Recovery builds on the procedures in this guide.
 :::
 
-You can use the backup feature of Camunda 8 Self-Managed to regularly back up the state of all of its components (Zeebe, Operate, Tasklist, and Optimize) without any downtime (except Web Modeler, see [the Web Modeler backup and restore documentation](./modeler-backup-and-restore.md)).
-In case of failures that lead to data loss, you can recover the cluster from a backup.
+## About this guide
 
-A backup of a Camunda 8 cluster consists of a backup of Zeebe, Operate, Tasklist, Optimize, and exported Zeebe records in Elasticsearch. Since the data of these applications are dependent on each other, it is important that the backup is consistent across all components. The backups of individual components taken independently may not form a consistent recovery point. Therefore, you must take the backup of a Camunda 8 cluster as a whole. To ensure a consistent backup, follow the process described below.
+This guide covers how to back up and restore your Camunda 8 Self-Managed components and cluster. Automate backup and restore procedures with tools that meet your organization's requirements.
 
-### Configure backup store
+:::info
 
-To take backups, you must first configure backup storage.
+With Camunda 8.8, the architecture was updated. For clarity, the [Orchestration Cluster](/reference/glossary.md#orchestration-cluster) now consists of:
 
-Operate, Tasklist, and Optimize use Elasticsearch as backend storage and use the snapshot feature of Elasticsearch for backing up their state. Therefore, you must configure a [snapshot repository](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-register-repository.html) in Elasticsearch.
+- Zeebe
+- Web Applications (Operate and Tasklist)
+- Admin
 
-Zeebe stores its backup to an external storage and must be configured before the cluster is started. Refer to [Zeebe backup configuration](/self-managed/operational-guides/backup-restore/zeebe-backup-and-restore.md#configuration) for additional information.
+Depending on context, we may refer to a specific subcomponent of the Orchestration Cluster where appropriate. This page focuses on backup procedures for Zeebe, Operate, Tasklist, Admin, and Optimize. Management Identity is not covered by the backup paths described here; back it up independently.
 
-### Backup process
-
-The backup of each component and the backup of a Camunda 8 cluster is identified by an id. This means a backup `x` of Camunda 8 consists of backup `x` of Zeebe, backup `x` of Optimize, backup `x` of Operate, and backup `x` of Tasklist. The backup id must be an integer and greater than the previous backups.
-
-:::note
-We recommend using the timestamp as the backup id.
 :::
 
-To back up a Camunda 8 cluster, execute the following sequential steps:
+This guide covers two backup paths depending on your secondary storage. Choose the path that matches your deployment:
 
-1. Trigger a backup `x` of Optimize. See [how to take an Optimize backup](/self-managed/operational-guides/backup-restore/optimize-backup.md).
-2. Trigger a backup `x` of Operate. See [how to take an Operate backup](/self-managed/operational-guides/backup-restore/operate-tasklist-backup.md).
-3. Trigger a backup `x` of Tasklist. See [how to take a Tasklist backup](/self-managed/operational-guides/backup-restore/operate-tasklist-backup.md).
-4. Wait until the backup `x` of Optimize is complete. See [how to monitor an Optimize backup](/self-managed/operational-guides/backup-restore/optimize-backup.md).
-5. Wait until the backup `x` of Operate is complete. See [how to monitor an Operate backup](/self-managed/operational-guides/backup-restore/operate-tasklist-backup.md).
-6. Wait until the backup `x` of Tasklist is complete. See [how to monitor a Tasklist backup](/self-managed/operational-guides/backup-restore/operate-tasklist-backup.md).
-7. Soft pause exporting in Zeebe. See [Zeebe management API](/self-managed/zeebe-deployment/operations/management-api.md).
-8. Take a backup `x` of the exported Zeebe records in Elasticsearch using the Elasticsearch Snapshots API.
+|                         | Elasticsearch / OpenSearch                                                                                                                        | Relational databases (RDBMS)                                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Components covered**  | Zeebe, Operate, Tasklist, Admin, Optimize                                                                                                         | Zeebe, Operate, Tasklist, Admin                                                                           |
+| **Optimize backup**     | Included — must be coordinated with all other components using the same backup ID. A mismatched backup ID produces an inconsistent restore point. | Not included — [back up Optimize independently](./optimize-backup-and-restore.md)                         |
+| **Backup coordination** | All components must be backed up together using the same backup ID                                                                                | Decoupled — Zeebe and RDBMS are backed up independently; Camunda aligns them automatically during restore |
+| **Continuous backups**  | Not supported                                                                                                                                     | Supported, fine-grained restore options available                                                         |
+| **Backup ID**           | User-supplied integer                                                                                                                             | Auto-generated by cluster                                                                                 |
 
+:::info
+The RDBMS backup path covers Zeebe, Operate, Tasklist, and Admin. Management Identity and Optimize are not covered by this path. Optimize always stores its data in Elasticsearch or OpenSearch, regardless of the Orchestration Cluster's secondary storage. If you use Optimize alongside an RDBMS-backed Orchestration Cluster, back up and restore Optimize independently using the [standalone Optimize backup procedure](./optimize-backup-and-restore.md). You do not need to switch the Orchestration Cluster to the Elasticsearch / OpenSearch backup path.
+:::
+
+:::warning
+Because Optimize and an RDBMS-backed Orchestration Cluster are backed up independently on separate schedules, they may be restored to **different points in time**. This means Optimize analytics data — dashboards, reports, and historical process data — may not be consistent with the restored state of the Orchestration Cluster.
+:::
+
+### Elasticsearch / OpenSearch
+
+Covers Zeebe, Operate, Tasklist, and Optimize. Back up and restore with no downtime using coordinated Elasticsearch or OpenSearch snapshots. All components in this backup flow must use the same backup ID to ensure consistency.
+
+<ZeebeGrid zeebe={esCards} />
+
+### Relational databases (RDBMS)
+
+This is the **first phase of new backup capabilities** enabled by using an RDBMS as secondary storage. It covers Zeebe, Operate, Tasklist, and Admin. Management Identity and Optimize are not included. If you deploy Optimize alongside an RDBMS-backed Orchestration Cluster, back up Optimize independently using the [standalone Optimize backup procedure](./optimize-backup-and-restore.md).
+
+Using an RDBMS as secondary storage unlocks three new capabilities not available in the Elasticsearch / OpenSearch path:
+
+- **Decoupled backups**: Zeebe (primary storage) and the RDBMS (secondary storage) can be backed up independently, on their own schedules. During restore, Camunda automatically aligns the two backups — there is no need to coordinate a shared backup ID or take snapshots at the same time.
+
+- **Scheduled backups**: Because backups are decoupled, Zeebe can take backups automatically on a fixed schedule without requiring external backup API calls.
+
+- **Point-in-time restore**: Zeebe continuously takes snapshots of its log stream. This creates a range of available restore points that you can restore to by timestamp, rather than being limited to a specific backup ID.
+
+<ZeebeGrid zeebe={rdbmsCards} />
+
+:::note
+
+- The examples in this guide are based on using the following tools: [curl](https://curl.se/), [jq](https://jqlang.org/), and [kubectl](https://kubernetes.io/de/docs/reference/kubectl/).
+
+:::
+
+## Considerations
+
+### Backup IDs (Elasticsearch / OpenSearch path only)
+
+When using Elasticsearch or OpenSearch as secondary storage, each component backup is identified by a user-supplied integer backup ID. The backup ID must be greater than the ID of any previous backup.
+
+:::note
+We recommend using the Unix timestamp as the backup ID.
+:::
+
+:::note
+When using the RDBMS path, backup IDs are auto-generated by the cluster and do not need to be managed manually.
+:::
+
+The steps outlined on this page are generally applicable for any kind of deployment but might differ slightly depending on your setup.
+
+### Management API
+
+The management API is an extension of the [Spring Boot Actuator](https://docs.spring.io/spring-boot/reference/actuator/index.html), typically used for monitoring and other operational purposes. This is not a public API and not exposed. You will need direct access to your Camunda cluster to be able to interact with these management APIs. This is why you'll often see the reference to `localhost`.
+
+Direct access will depend on your deployment environment. For example, direct Kubernetes cluster access with [port-forwarding](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_port-forward/) or [exec](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_exec/) to execute commands directly on Kubernetes pods. In a manual deployment you will need to be able to reach the machines that host Camunda. Typically, the management port is on port `9600` but might differ on your setup and on the components. You can find the default for each component in their configuration page.
+
+| Component                                                                                                               | Port |
+| ----------------------------------------------------------------------------------------------------------------------- | ---- |
+| [Optimize](/self-managed/components/optimize/configuration/system-configuration.md#container)                           | 8092 |
+| [Orchestration Cluster](/self-managed/components/orchestration-cluster/zeebe/configuration/gateway.md#managementserver) | 9600 |
+
+#### Examples for Kubernetes approaches
+
+<Tabs groupId="application-ports">
+   <TabItem value="port-forwarding" label="Port Forwarding" default>
+
+Port-forwarding allows you to temporarily bind a remote Kubernetes cluster port of a service or pod directly to your local machine, allowing you to interact with it via `localhost:PORT`.
+
+Since the services are bound to your local machine, you **cannot reuse the same port for all port-forwards** unless you start and stop each one based on usage. To avoid this limitation, the examples use different local ports for each service, allowing them to run simultaneously without conflict.
+
+```bash
+export CAMUNDA_RELEASE_NAME="camunda"
+# kubectl port-forward services/$SERVICE_NAME $LOCAL_PORT:$REMOTE_PORT
+kubectl port-forward services/$CAMUNDA_RELEASE_NAME-zeebe-gateway 9600:9600 & \
+kubectl port-forward services/$CAMUNDA_RELEASE_NAME-optimize 8092:8092 & \
+kubectl port-forward services/$CAMUNDA_RELEASE_NAME-elasticsearch 9200:9200 &
 ```
 
-PUT /_snapshot/my_repository/camunda_zeebe_records_backup_x
-{
-   "indices": "zeebe-record*",
-   "feature_states": ["none"]
-}
+Using the bash instruction `&` at the end of each line would run the command in a subshell allowing the use of a single terminal.
 
+   </TabItem>
+   <TabItem value="exec" label="Exec">
+
+An alternative to port-forwarding is to run commands directly on Kubernetes pods.
+In this example we're going to spawn a temporary pod to execute a curl request.
+Alternatives are to use existing pods within the namespace. Camunda's pod includes different base images, each with a different feature set.
+
+```bash
+# following will create a temporary alias within your terminal to overwrite the normal curl
+export CAMUNDA_NAMESPACE="camunda"
+export CAMUNDA_RELEASE_NAME="camunda"
+# temporary overwrite of curl, can be removed with `unalias curl` again
+alias curl="kubectl run curl --rm -i -n $CAMUNDA_NAMESPACE --restart=Never --image=alpine/curl -- -sS"
+
+curl $CAMUNDA_RELEASE_NAME-zeebe-gateway:9600/actuator/health
+curl $CAMUNDA_RELEASE_NAME-optimize:8092/actuator/health
+curl $CAMUNDA_RELEASE_NAME-elasticsearch:9200/_cluster/health
 ```
 
-By default, the indices are prefixed with `zeebe-record`. If you have configured a different prefix when configuring Elasticsearch exporter in Zeebe, use this instead.
+This allows you to directly execute commands within the namespace and communicate with available services.
 
-9. Wait until the backup `x` of the exported Zeebe records is complete before proceeding.
-   Take a backup `x` of Zeebe. See [how to take a Zeebe backup](/self-managed/operational-guides/backup-restore/zeebe-backup-and-restore.md).
-10. Wait until the backup `x` of Zeebe is completed before proceeding. See [how to monitor a Zeebe backup](/self-managed/operational-guides/backup-restore/zeebe-backup-and-restore.md).
-    Resume exporting in Zeebe. See [Zeebe management API](/self-managed/zeebe-deployment/operations/management-api.md).
+   </TabItem>
+   <TabItem value="jobs" label="Cronjob">
+
+The examples in this guide showcase the backup process in a manual fashion to help you fully understand the process.
+You might want to use [Kubernetes Cronjobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) to automate the backup process for your own use case based on your own environment on a regular schedule.
+
+Kubernetes Cronjobs will spawn a [Job](https://kubernetes.io/docs/concepts/workloads/controllers/job/) on a regular basis. The job will run a defined image within a given namespace, allowing you to run commands and interact with the environment.
 
 :::note
-If any of the steps above fail, you may have to restart with a new backup id. Ensure exporting is resumed if the backup process force quits in the middle of the process.
+
+You can see further examples from Camunda consultants in the [Backup and Restore Workshop](https://github.com/camunda-consulting/c8-devops-workshop/tree/main/03%20-%20Lab%203%20-%20Backup%20and%20Restore). You can use these examples to achieve similar automation.
+
 :::
 
-### Restore
+   </TabItem>
 
-To restore a Camunda 8 cluster from a backup, all components must be restored from their backup corresponding to the same backup id:
+</Tabs>
 
-1. Start Zeebe, Operate, Tasklist, and Optimize. (To ensure templates/aliases etc. are created)
-2. Confirm proper configuration (such as shards, replicas count, etc.)
-3. Stop Operate, Tasklist, and Optimize.
-4. Delete all indices.
-5. Restore the state of [Operate](/self-managed/operational-guides/backup-restore/operate-tasklist-backup.md), [Tasklist](/self-managed/operational-guides/backup-restore/operate-tasklist-backup.md), and [Optimize](/self-managed/operational-guides/backup-restore/optimize-backup.md).
-6. Restore `zeebe-records*` indices from Elasticsearch snapshot.
-7. Restore [Zeebe](/self-managed/operational-guides/backup-restore/zeebe-backup-and-restore.md).
-8. Start Zeebe, Operate, Tasklist, and Optimize.
+### ContextPath
+
+If you are defining the `contextPath` in the Camunda Helm chart or the `management.server.servlet.context-path` in a standalone setup, your API requests must prepend the value specific to the `contextPath` for the individual component. If the `management.server.port` is defined this also applies to `management.endpoints.web.base-path`. You can learn more about this behavior in the [Spring Boot documentation](https://docs.spring.io/spring-boot/docs/2.1.7.RELEASE/reference/html/production-ready-monitoring.html#production-ready-customizing-management-server-context-path).
+
+:::warning Optimize Helm chart Exception
+Setting the `contextPath` in the Helm chart for Optimize will not overwrite the `contextPath` of the management API, it will remain as `/`.
+:::
+
+<details>
+<summary>Example</summary>
+<summary>
+
+If you are defining the `contextPath` for the Orchestration Cluster in the Camunda Helm chart:
+
+```bash
+orchestration:
+   contextPath: /example
+```
+
+A call to the management API of the Orchestration Cluster would look like the following example:
+
+```bash
+ORCHESTRATION_CLUSTER_MANAGEMENT_API=http://localhost:9600
+
+curl $ORCHESTRATION_CLUSTER_MANAGEMENT_API/example/actuator/health
+```
+
+Without the `contextPath` it would just be:
+
+```bash
+ORCHESTRATION_CLUSTER_MANAGEMENT_API=http://localhost:9600
+
+curl $ORCHESTRATION_CLUSTER_MANAGEMENT_API/actuator/health
+```
+
+</summary>
+</details>
+
+## Back up a cluster with multiple Physical Tenants
+
+<span class="badge badge--platform">Self-Managed only</span>
+
+In a cluster running multiple [Physical Tenants](/self-managed/concepts/physical-tenants/index.md), backup and exporting control are available at two scopes. The backup procedure itself is unchanged; only the endpoint you call and the identity you call it with differ.
+
+| Scope        | Path prefix                                 | Authorization                                       | Use it to                                                      |
+| ------------ | ------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------------- |
+| Tenant       | `/physical-tenants/{physicalTenantId}/v2/…` | Tenant-local `BACKUP` and `EXPORTER` permissions    | Back up or inspect one Physical Tenant                         |
+| Cluster-wide | `/cluster/v2/…`                             | [Cluster admin](/components/admin/cluster-admin.md) | Back up every Physical Tenant in one call, or inspect them all |
+
+Both scopes serve the same operations:
+
+| Operation         | Tenant-scoped                                                   | Cluster-wide                        |
+| ----------------- | --------------------------------------------------------------- | ----------------------------------- |
+| Runtime backup    | `/physical-tenants/{physicalTenantId}/v2/backups/runtime`       | `/cluster/v2/backups/runtime`       |
+| Runtime state     | `/physical-tenants/{physicalTenantId}/v2/backups/runtime/state` | `/cluster/v2/backups/runtime/state` |
+| History backup    | `/physical-tenants/{physicalTenantId}/v2/backups/history`       | `/cluster/v2/backups/history`       |
+| Exporting control | `/physical-tenants/{physicalTenantId}/v2/exporting`             | `/cluster/v2/exporting`             |
+
+Each cluster-wide endpoint also accepts an optional `physicalTenantId` query parameter, which narrows the same cluster-admin call to one tenant. Omit it to target every Physical Tenant.
+
+A cluster-wide request fans out to each tenant and reports the outcome per tenant, so a partial result is visible rather than hidden. Because each tenant reaches its terminal state independently, a cluster-wide backup is a set of per-tenant backups rather than a single coordinated snapshot.
+
+### Backup IDs across Physical Tenants
+
+A backup ID is unique within a Physical Tenant. Reusing an existing ID for the same tenant is rejected with `409`, while the same ID can be used by a different tenant, because each tenant has its own backup namespace.
+
+When a tenant has scheduled or continuous backups enabled, backup IDs are generated and an explicit ID is rejected. Because backup configuration is per tenant, tenants in the same cluster can be in different modes. A cluster-wide request with an explicit ID fails if any tenant generates its own IDs, and a request without an explicit ID fails if any tenant requires one. Use the tenant-scoped endpoints for mixed configurations.
+
+### Storage backends and Physical Tenants
+
+- **Elasticsearch and OpenSearch**: history backup endpoints are available. Each Physical Tenant requires its own snapshot repository, so tenants never share a snapshot namespace.
+- **Relational databases (RDBMS)**: history backup endpoints are not served. Back up each tenant's schema, database, or table prefix with the database's own tooling.
+- **Document stores**: back up each tenant's bucket, container, or path with the storage system's own tooling. The Orchestration Cluster exposes no backup API for document stores.
+
+Configure non-overlapping backup locations before starting the cluster. Camunda validates the resolved location per tenant at startup and fails to start if two tenants resolve to the same one. For the isolation rules and configuration examples, see [storage isolation](/self-managed/concepts/physical-tenants/storage-isolation.md).
+
+<!-- TODO(physical-tenants-day-2): Add concrete per-tenant backup-store configuration properties and artifact examples for runtime and history backups. Owner/reviewer: Houssain Barouni. -->
+
+To restore, see [in-process restore](./in-process-restore.md#restore-a-cluster-with-multiple-physical-tenants).

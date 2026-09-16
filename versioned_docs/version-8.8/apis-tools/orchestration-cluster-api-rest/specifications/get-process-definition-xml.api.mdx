@@ -1,0 +1,322 @@
+---
+id: get-process-definition-xml
+title: "Get process definition XML"
+description: "<MarkerEventuallyConsistentExtension />"
+sidebar_label: "Get process definition XML"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "get api-method"
+info_path: versioned_docs/version-8.8/apis-tools/orchestration-cluster-api-rest/specifications/orchestration-cluster-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MarkerEventuallyConsistentExtension from "@site/src/mdx/MarkerEventuallyConsistentExtension";
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get process definition XML"}
+></Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/process-definitions/{processDefinitionKey}/xml"}
+  context={"endpoint"}
+></MethodEndpoint>
+
+<MarkerEventuallyConsistentExtension />
+
+Returns process definition as XML.
+
+<Heading id={"request"} as={"h2"} className={"openapi-tabs__heading"}>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails
+  parameters={[
+    {
+      name: "processDefinitionKey",
+      in: "path",
+      required: true,
+      description:
+        "The assigned key of the process definition, which acts as a unique identifier for this process definition.",
+      schema: {
+        type: "string",
+        format: "string<ProcessDefinitionKey>",
+        description:
+          "Zeebe Engine resource key (Java long serialized as string)",
+      },
+    },
+  ]}
+></ParamsDetails>
+
+<RequestSchema title={"Body"} body={undefined}></RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{
+    "200": {
+      description:
+        "The XML of the process definition is successfully returned.",
+      content: { "text/xml": { schema: { type: "string" } } },
+    },
+    "204": {
+      description: "The process definition was found but does not have XML.",
+      content: { "text/plain": { schema: { type: "string" } } },
+    },
+    "400": {
+      description: "The provided data is not valid.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "401": {
+      description: "The request lacks valid authentication credentials.",
+      headers: { "WWW-Authenticate": { schema: { type: "string" } } },
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "403": {
+      description: "Forbidden. The request is not allowed.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "404": {
+      description:
+        "The decision with the given key was not found. More details are provided in the response body.\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "500": {
+      description: "An internal error occurred while processing the request.\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+  }}
+></StatusCodes>

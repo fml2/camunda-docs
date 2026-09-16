@@ -1,26 +1,28 @@
 ---
 id: microsoft-o365-mail
-title: Microsoft 365 Connector
-sidebar_label: Microsoft 365 Connector
-description: Send and read Microsoft 365 emails from your BPMN process.
+title: Microsoft 365 connector
+sidebar_label: Microsoft 365 Email (Outbound)
+description: Integrate Outlook email with Microsoft 365 in your processes.
 ---
 
-The **Microsoft 365 Connector** is an outbound Connector that allows you to connect your BPMN service with [Microsoft 365](https://outlook.office.com/mail/) mail to send, read e-mails, and manage folders.
+The Microsoft 365 Connector is an outbound connector that allows you to connect your BPMN service with [Microsoft 365](https://outlook.office.com/mail/) mail to send emails, read emails, and manage folders.
 
 ## Prerequisites
 
-- To use the **Microsoft 365 Connector**, you must have a [Microsoft 365](https://outlook.office.com/mail/) mail instance.
-- You might also need to have sufficient access rights at [Microsoft Entra](https://entra.microsoft.com) to create a new app;
-  set [Microsoft Graph](https://developer.microsoft.com/en-us/graph) permissions and assign an app to u user.
+- A [Microsoft 365](https://outlook.office.com/mail/) mail instance.
+- Sufficient permissions in [Microsoft Entra](https://entra.microsoft.com) to:
+  - Create a new app registration
+  - Configure [Microsoft Graph](https://developer.microsoft.com/en-us/graph) permissions
+  - Assign the app to a user
 
-Learn more about [creating, configuring, and authorizing Microsoft App](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app).
+Learn more about [creating, configuring, and authorizing a Microsoft app](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app).
 
 :::note
-Use Camunda secrets to avoid exposing your Microsoft credentials as plain text.
-Refer to our documentation on [managing secrets](/components/console/manage-clusters/manage-secrets.md) to learn more.
+Use secrets to avoid exposing your Microsoft credentials as plain text.
+Refer to our documentation on [managing secrets](/components/hub/organization/manage-clusters/manage-secrets.md) to learn more.
 :::
 
-## Create a Microsoft 365 Connector task
+## Create a Microsoft 365 connector task
 
 import ConnectorTask from '../../../components/react-components/connector-task.md'
 
@@ -30,13 +32,17 @@ import ConnectorTask from '../../../components/react-components/connector-task.m
 
 Each operation requires permissions to be assigned by a system administrator. Learn more about [Microsoft permissions](https://learn.microsoft.com/en-us/entra/identity-platform/permissions-consent-overview).
 
+:::warning
+By default, an application with Mail API permissions can access _all mailboxes_ in your organization. To restrict access to specific mailboxes, use _Role-Based Access Control (RBAC) for Applications_. Learn more about [scoping application permissions to specific Exchange Online mailboxes](https://learn.microsoft.com/en-us/graph/auth-limit-mailbox-access).
+:::
+
 ### Bearer token authentication
 
-If you own a bearer token, in the **Authentication** section select a **Bearer token** in the **Type** field.
-Enter a bearer token in the field **Bearer token**. Use [Camunda secrets](/components/console/manage-clusters/manage-secrets.md) to avoid exposing sensitive credentials.
+If you own a bearer token, in the **Authentication** section select **Bearer token** in the **Type** field.
+Enter a bearer token in the field **Bearer token**. Use [secrets](/components/hub/organization/manage-clusters/manage-secrets.md) to avoid exposing sensitive credentials.
 
 :::note
-Default TTL for bearer tokens is 3600 seconds. Therefore, this approach might not work for long-living and/or repetitive processes.
+The default time-to-live (TTL) for bearer tokens is 3600 seconds. Therefore, this approach might not work for long-living and/or repetitive processes.
 :::
 
 ### OAuth2 client credentials flow authentication
@@ -54,7 +60,7 @@ To proceed with this step, you'll need the following data:
 
 The app must be assigned to a user.
 
-If you own a bearer token, in the **Authentication** section select a **OAuth 2.0** in the **Type** field.
+If you own a bearer token, in the **Authentication** section select **OAuth 2.0** in the **Type** field.
 Enter the above data into the respective fields.
 
 Learn more about [creating, configuring, and authorizing Microsoft App](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app).
@@ -111,7 +117,7 @@ Related Microsoft Graph API: [user: sendMail](https://learn.microsoft.com/en-us/
 5. Pass an array of emails into the **To recipients** field, for example `["myuser1@mycompany.com", "myuser2@mycompany.com"]`.
 6. (Optional) Pass an array of emails into the **CC recipients** field, for example `["myuser3@mycompany.com", "myuser4@mycompany.com"]`.
 
-## Handle Connector response
+## Handle connector response
 
-The **Microsoft 365 Connector** is a protocol Connector, meaning it is built on top of the **HTTP REST Connector**, therefore
+The Microsoft 365 Connector is a protocol connector, meaning it is built on top of the **HTTP REST connector**, therefore
 [handling response is still applicable](/components/connectors/protocol/rest.md#response).

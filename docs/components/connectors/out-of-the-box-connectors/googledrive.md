@@ -1,26 +1,27 @@
 ---
 id: googledrive
-title: Google Drive Connector
+title: Google Drive connector
+sidebar_label: Google Drive
 description: Create folders or files from a Google Drive template from your BPMN process.
 ---
 
-The **Google Drive Connector** is an outbound Connector that allows you to create empty folders or files on [Google Drive](https://drive.google.com/) from templates from your BPMN process.
+The **Google Drive connector** is an outbound connector that allows you to create empty folders or files on [Google Drive](https://drive.google.com/) from templates from your BPMN process.
 
 ## Prerequisites
 
-To start working with the **Google Drive Connector**, a relevant OAuth token must be configured and stored as a secret in your cluster. The token must have permission to read and create a folder and/or files from a desired Google Drive instance. Follow the steps from the [appendix](#appendix--faq) to find out more about creating an OAuth token and giving relevant permissions.
+To start working with the **Google Drive connector**, a relevant OAuth token must be configured and stored as a secret in your cluster. The token must have permission to read and create a folder and/or files from a desired Google Drive instance. Follow the steps from the [appendix](#appendix--faq) to find out more about creating an OAuth token and giving relevant permissions.
 
-## Create a Google Drive Connector task
+## Create a Google Drive connector task
 
-Currently, the Google Drive Connector supports two types of operations: create a folder and create a file from a template.
+Currently, the Google Drive connector supports two types of operations: create a folder and create a file from a template.
 
 import ConnectorTask from '../../../components/react-components/connector-task.md'
 
 <ConnectorTask/>
 
-## Make your Google Drive Connector executable
+## Make your Google Drive connector executable
 
-To make the **Google Drive Connector** executable, fill out the mandatory fields highlighted in red in the properties panel.
+To make the **Google Drive connector** executable, fill out the mandatory fields highlighted in red in the properties panel on the right side of the screen.
 
 ### Create a new folder
 
@@ -44,13 +45,50 @@ To create a new file from a template, take the following steps:
 6. In the **Operation Details** section, set the field **Template variables** as desired variables that will be applied to the template. The template variables are compatible with the Google Docs [Requests API](https://developers.google.com/docs/api/reference/rest/v1/documents/request). This property requires FEEL input.
 7. _(optional)_ In the **Operation Details** section, you can set the **Additional properties or metadata** field to Google Drive compatible properties. This property requires FEEL input. Check [the appendix](#what-are-the-limitations-of-the-additional-properties-or-metadata) for known values and limitations.
 
-## Google Drive Connector response
+:::note
+Starting from version 8.7.0, the Google Drive connector supports uploading documents from (or downloading documents to) the Camunda document store. Review the **Document** field in the properties panel where the document reference can be provided. See additional details and limitations in [document handling](/components/document-handling/getting-started.md).
+:::
 
-The **Google Drive Connector** exposes Google Drive API response as a local variable called response.
+### Upload file
+
+To upload a file, take the following steps:
+
+1. Set the required credentials in the **Authentication** section. Refer to the [relevant appendix entry](#how-can-i-authenticate-my-connector) to find out more.
+2. In the **Select Operation** section, set the field value **Operation Type** to **Upload File**.
+3. _(optional)_ In the **Operation Details** section, set the field **Parent folder ID** to the desired parent, inside which a new file will be created. If not specified, a new folder is created in the Google Drive root folder of the user who owns the OAuth token.
+4. In the **Document** section, select a [document source](/components/document-handling/send-document-to-external-system.md#document-sources): a **Camunda document** reference, **inline content** built from process data, or an **external document** URL.
+
+:::note
+Use **inline content** to build a file directly from process variables without first storing it in the Camunda document store. See [inline documents](/components/document-handling/send-document-to-external-system.md#inline-documents).
+
+To upload a **Camunda document**, it must exist first — [using the Orchestration Cluster REST API](/apis-tools/orchestration-cluster-api-rest/specifications/create-document.api.mdx) for example. The result of the endpoint must then be assigned to a variable in **Start Process instance** so you can use the variable in the **Document** field.
+:::
+
+### Download file
+
+To download a file, take the following steps:
+
+1. Set the required credentials in the **Authentication** section. Refer to the [relevant appendix entry](#how-can-i-authenticate-my-connector) to find out more.
+2. In the **Select Operation** section, set the field value **Operation Type** to **Download File**.
+3. In the **Operation Details** section, set the field _File ID_ to the google drive file that will be downloaded. For more information, refer to the [file id appendix](#Where-do-I-get-File-ID).
+4. Select a [return format](/components/document-handling/send-document-to-external-system.md#return-formats) for the downloaded content: **Document reference** (default), **As text** (with an optional encoding, default UTF-8), or **As JSON**.
+
+## Google Drive connector response
+
+The following response types can be returned by the _Google Drive connector response_, depending on the **Operation Type** selected.
+
+### Response type for list of operations
+
+- **Create Folder**
+- **Create File from template**
+- **Upload File**
+
+The **Google Drive connector response** exposes the Google Drive API response as a local variable named "response".
+
 The following fields are available in the response variable:
 
-- `googleDriveResourceId` - ID of the newly created resource.
-- `googleDriveResourceUrl` - Human-readable URL of the newly created resource.
+- `googleDriveResourceId`: The ID of the newly created resource.
+- `googleDriveResourceUrl`: Human-readable URL of the newly created resource.
 
 You can use an output mapping to map the response:
 
@@ -64,19 +102,41 @@ You can use an output mapping to map the response:
 }
 ```
 
+### Response type for _Download file_ operation only
+
+The response depends on the selected [return format](/components/document-handling/send-document-to-external-system.md#return-formats):
+
+- **Document reference** (default) returns a document created in the Camunda document store, identical to the [REST API](/apis-tools/orchestration-cluster-api-rest/specifications/create-document.api.mdx). For example:
+
+```
+{
+    "camunda.document.type": "camunda",
+    "storeId": "in-memory",
+    "documentId": "c3c8e499-321d-421c-afa2-4632d2f5ce48",
+    "metadata": {
+        "contentType": "image/png",
+        "fileName": "file name",
+        "size": 66497,
+        "customProperties": {}
+    }
+}
+```
+
+- **As text** returns the content decoded as a string, and **As JSON** returns it parsed as JSON. Both are subject to a size guard (approximately 1.5 MiB); use **Document reference** for large files.
+
 ## Appendix & FAQ
 
-### What Google API does the Google Drive Connector use to create a folder?
+### What Google API does the Google Drive connector use to create a folder?
 
-The **Google Drive Connector** uses the Google Drive [`Files:Create`](https://developers.google.com/drive/api/v3/reference/files/create) API endpoint.
+The **Google Drive connector** uses the Google Drive [`Files:Create`](https://developers.google.com/drive/api/v3/reference/files/create) API endpoint.
 
-### What Google API does the Google Drive Connector use to create a file from template?
+### What Google API does the Google Drive connector use to create a file from template?
 
-The **Google Drive Connector** uses the Google Drive [`Files:Copy`](https://developers.google.com/drive/api/v3/reference/files/copy) API endpoint to copy an original template. Afterwards, the **Google Drive Connector** utilizes Google Docs [Merge](https://developers.google.com/docs/api/how-tos/merge) approach via [`Documents:BatchUpdate`](https://developers.google.com/docs/api/reference/rest/v1/documents/batchUpdate) Google Docs API method.
+The **Google Drive connector** uses the Google Drive [`Files:Copy`](https://developers.google.com/drive/api/v3/reference/files/copy) API endpoint to copy an original template. Afterwards, the **Google Drive connector** utilizes Google Docs [Merge](https://developers.google.com/docs/api/how-tos/merge) approach via [`Documents:BatchUpdate`](https://developers.google.com/docs/api/reference/rest/v1/documents/batchUpdate) Google Docs API method.
 
-### How can I authenticate my Connector?
+### How can I authenticate my connector?
 
-The **Google Drive Connector** currently supports two methods for authentication and authorization: based on short-lived JWT bearer token, and based on refresh token.
+The **Google Drive connector** currently supports two methods for authentication and authorization: based on short-lived JWT bearer token, and based on refresh token.
 
 Google supports multiple ways to obtain both. Refer to the [official Google OAuth documentation](https://developers.google.com/identity/protocols/oauth2) to get up-to-date instructions or refer to the examples below.
 
@@ -84,7 +144,7 @@ You also enable _Google Docs API_ and _Google Drive API_ for every client intend
 
 #### Example 1: Obtaining JWT bearer token with a service account
 
-:::warning
+:::danger
 The following code snippet is for demonstration purposes only and must not be used for real production systems due to security concerns.
 For production usage, follow the [official Google guidelines](https://developers.google.com/identity/protocols/oauth2/service-account).
 :::
@@ -106,9 +166,11 @@ credentials.refresh(auth_req)
 print(credentials.token)
 ```
 
+When using shared drives, you must use an Oauth client instead of a service account. The service account does not have access to shared drives.
+
 #### Example 2: Obtaining bearer and refresh tokens with OAuth client
 
-:::warning
+:::danger
 The following code snippet is for demonstration purposes only and must not be used for real production systems due to security concerns.
 For production usage, follow the [official Google guidelines](https://developers.google.com/identity/protocols/oauth2/web-server).
 :::
@@ -282,6 +344,20 @@ Jane T. Doe, Executive Director
 
 ```
 
+### Where do I get File ID?
+
+To find the File ID for a Google file, follow these steps:
+
+1. Select the desired file on your Google Drive, click on the three horizontal dots to the right of the file name.
+2. Click on the share section.
+3. Click on copy link. The URL will look something like the following:
+
+```
+https://drive.google.com/file/d/1y1td3iIKWOh88gK4hVevGM1WnX7tibCW/view
+```
+
+4. The File ID is the alphanumeric string after `/d/`. In this example, this would be `1y1td3iIKWOh88gK4hVevGM1WnX7tibCW`.
+
 ### What kind of templates are currently supported?
 
-The **Google Drive Connector** currently supports only Google Doc files (MIME type `application/vnd.google-apps.document`).
+The **Google Drive connector** currently supports only Google Doc files (MIME type `application/vnd.google-apps.document`).

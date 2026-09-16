@@ -1,0 +1,663 @@
+---
+id: search-decision-definitions
+title: "Search decision definitions"
+description: "<MarkerEventuallyConsistentExtension />"
+sidebar_label: "Search decision definitions"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: versioned_docs/version-8.8/apis-tools/orchestration-cluster-api-rest/specifications/orchestration-cluster-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MarkerEventuallyConsistentExtension from "@site/src/mdx/MarkerEventuallyConsistentExtension";
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Search decision definitions"}
+></Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/decision-definitions/search"}
+  context={"endpoint"}
+></MethodEndpoint>
+
+<MarkerEventuallyConsistentExtension />
+
+Search for decision definitions based on given criteria.
+
+<Heading id={"request"} as={"h2"} className={"openapi-tabs__heading"}>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails parameters={undefined}></ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{
+    required: false,
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          allOf: [
+            {
+              type: "object",
+              properties: {
+                page: {
+                  description: "Pagination criteria.",
+                  allOf: [
+                    {
+                      description:
+                        "Pagination criteria. Can use offset-based pagination (from/limit) OR cursor-based pagination (after/before + limit), but not both.",
+                      oneOf: [
+                        {
+                          type: "object",
+                          title: "Offset-based pagination",
+                          properties: {
+                            from: {
+                              description:
+                                "The index of items to start searching from.",
+                              type: "integer",
+                              format: "int32",
+                              default: 0,
+                              minimum: 0,
+                            },
+                            limit: {
+                              description:
+                                "The maximum number of items to return in one request.",
+                              type: "integer",
+                              format: "int32",
+                              default: 100,
+                              minimum: 1,
+                            },
+                          },
+                        },
+                        {
+                          type: "object",
+                          title: "Cursor-based forward pagination",
+                          required: ["after"],
+                          properties: {
+                            after: {
+                              description:
+                                "Use the `endCursor` value from the previous response to fetch the next page of results.",
+                              allOf: [
+                                {
+                                  description:
+                                    "The end cursor in a search query result set.",
+                                  format: "base64",
+                                  type: "string",
+                                  example: "WzIyNTE3OTk4MTM2ODcxMDJd",
+                                  title: "EndCursor",
+                                },
+                              ],
+                            },
+                            limit: {
+                              description:
+                                "The maximum number of items to return in one request.",
+                              type: "integer",
+                              format: "int32",
+                              default: 100,
+                            },
+                          },
+                        },
+                        {
+                          type: "object",
+                          title: "Cursor-based backward pagination",
+                          required: ["before"],
+                          properties: {
+                            before: {
+                              description:
+                                "Use the `startCursor` value from the previous response to fetch the previous page of results.",
+                              allOf: [
+                                {
+                                  description:
+                                    "The start cursor in a search query result set.",
+                                  format: "base64",
+                                  type: "string",
+                                  example: "WzIyNTE3OTk4MTM2ODcxMDJd",
+                                  title: "StartCursor",
+                                },
+                              ],
+                            },
+                            limit: {
+                              description:
+                                "The maximum number of items to return in one request.",
+                              type: "integer",
+                              format: "int32",
+                              default: 100,
+                            },
+                          },
+                        },
+                      ],
+                      title: "SearchQueryPageRequest",
+                    },
+                  ],
+                  type: "object",
+                },
+              },
+              title: "SearchQueryRequest",
+            },
+          ],
+          properties: {
+            sort: {
+              description: "Sort field criteria.",
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  field: {
+                    description: "The field to sort by.",
+                    type: "string",
+                    enum: [
+                      "decisionDefinitionKey",
+                      "decisionDefinitionId",
+                      "name",
+                      "version",
+                      "decisionRequirementsId",
+                      "decisionRequirementsKey",
+                      "tenantId",
+                    ],
+                  },
+                  order: {
+                    description:
+                      "The order in which to sort the related field.",
+                    type: "string",
+                    enum: ["ASC", "DESC"],
+                    default: "ASC",
+                    title: "SortOrderEnum",
+                  },
+                },
+                required: ["field"],
+                title: "DecisionDefinitionSearchQuerySortRequest",
+              },
+            },
+            filter: {
+              description: "The decision definition search filters.",
+              allOf: [
+                {
+                  description: "Decision definition search filter.",
+                  type: "object",
+                  properties: {
+                    decisionDefinitionId: {
+                      allOf: [
+                        {
+                          description:
+                            "Id of a decision definition, from the model. Only ids of decision definitions that are deployed are useful.",
+                          format: "DecisionDefinitionId",
+                          type: "string",
+                          example: "new-hire-onboarding-workflow",
+                          title: "DecisionDefinitionId",
+                        },
+                      ],
+                      description: "The DMN ID of the decision definition.",
+                    },
+                    name: {
+                      type: "string",
+                      description: "The DMN name of the decision definition.",
+                    },
+                    version: {
+                      type: "integer",
+                      format: "int32",
+                      description:
+                        "The assigned version of the decision definition.",
+                    },
+                    decisionRequirementsId: {
+                      type: "string",
+                      description:
+                        "the DMN ID of the decision requirements graph that the decision definition is part of.",
+                    },
+                    tenantId: {
+                      description: "The tenant ID of the decision definition.",
+                      allOf: [
+                        {
+                          example: "customer-service",
+                          description: "The unique identifier of the tenant.",
+                          format: "TenantId",
+                          type: "string",
+                          title: "TenantId",
+                        },
+                      ],
+                    },
+                    decisionDefinitionKey: {
+                      allOf: [
+                        {
+                          description:
+                            "System-generated key for a decision definition.",
+                          format: "DecisionDefinitionKey",
+                          example: "2251799813326547",
+                          type: "string",
+                          allOf: [
+                            {
+                              description:
+                                "Zeebe Engine resource key (Java long serialized as string)",
+                              type: "string",
+                              title: "LongKey",
+                            },
+                          ],
+                          title: "DecisionDefinitionKey",
+                        },
+                      ],
+                      description:
+                        "The assigned key, which acts as a unique identifier for this decision definition.",
+                    },
+                    decisionRequirementsKey: {
+                      allOf: [
+                        {
+                          allOf: [
+                            {
+                              description:
+                                "Zeebe Engine resource key (Java long serialized as string)",
+                              type: "string",
+                              title: "LongKey",
+                            },
+                          ],
+                          description:
+                            "System-generated key for a deployed decision requirements definition.",
+                          format: "DecisionRequirementsKey",
+                          example: "2251799813683346",
+                          type: "string",
+                          title: "DecisionRequirementsKey",
+                        },
+                      ],
+                      description:
+                        "The assigned key of the decision requirements graph that the decision definition is part of.",
+                    },
+                  },
+                  title: "DecisionDefinitionFilter",
+                },
+              ],
+            },
+          },
+          title: "DecisionDefinitionSearchQuery",
+        },
+      },
+    },
+  }}
+></RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{
+    "200": {
+      description: "The decision definition search result.",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            allOf: [
+              {
+                type: "object",
+                required: ["page"],
+                properties: {
+                  page: {
+                    description:
+                      "Pagination information about the search results.",
+                    allOf: [
+                      {
+                        description:
+                          "Pagination information about the search results.",
+                        type: "object",
+                        required: ["totalItems"],
+                        properties: {
+                          totalItems: {
+                            description: "Total items matching the criteria.",
+                            type: "integer",
+                            format: "int64",
+                            example: 1,
+                          },
+                          hasMoreTotalItems: {
+                            description:
+                              "Indicates if more results exist beyond the reported totalItems value. Due to system limitations, the totalItems value can be capped.\n",
+                            type: "boolean",
+                            example: false,
+                          },
+                          startCursor: {
+                            description:
+                              "The cursor value for getting the previous page of results. Use this in the `before` field of an ensuing request.",
+                            allOf: [
+                              {
+                                description:
+                                  "The start cursor in a search query result set.",
+                                format: "base64",
+                                type: "string",
+                                example: "WzIyNTE3OTk4MTM2ODcxMDJd",
+                                title: "StartCursor",
+                              },
+                            ],
+                          },
+                          endCursor: {
+                            description:
+                              "The cursor value for getting the next page of results. Use this in the `after` field of an ensuing request.",
+                            allOf: [
+                              {
+                                description:
+                                  "The end cursor in a search query result set.",
+                                format: "base64",
+                                type: "string",
+                                example: "WzIyNTE3OTk4MTM2ODcxMDJd",
+                                title: "EndCursor",
+                              },
+                            ],
+                          },
+                        },
+                        example: { totalItems: 1, hasMoreTotalItems: false },
+                        title: "SearchQueryPageResponse",
+                      },
+                    ],
+                  },
+                },
+                title: "SearchQueryResponse",
+              },
+            ],
+            properties: {
+              items: {
+                description: "The matching decision definitions.",
+                type: "array",
+                required: ["items"],
+                items: {
+                  type: "object",
+                  properties: {
+                    decisionDefinitionId: {
+                      allOf: [
+                        {
+                          description:
+                            "Id of a decision definition, from the model. Only ids of decision definitions that are deployed are useful.",
+                          format: "DecisionDefinitionId",
+                          type: "string",
+                          example: "new-hire-onboarding-workflow",
+                          title: "DecisionDefinitionId",
+                        },
+                      ],
+                      description: "The DMN ID of the decision definition.",
+                    },
+                    name: {
+                      type: "string",
+                      description: "The DMN name of the decision definition.",
+                    },
+                    version: {
+                      type: "integer",
+                      format: "int32",
+                      description:
+                        "The assigned version of the decision definition.",
+                    },
+                    decisionRequirementsId: {
+                      type: "string",
+                      description:
+                        "the DMN ID of the decision requirements graph that the decision definition is part of.",
+                    },
+                    tenantId: {
+                      description: "The tenant ID of the decision definition.",
+                      allOf: [
+                        {
+                          example: "customer-service",
+                          description: "The unique identifier of the tenant.",
+                          format: "TenantId",
+                          type: "string",
+                          title: "TenantId",
+                        },
+                      ],
+                    },
+                    decisionDefinitionKey: {
+                      allOf: [
+                        {
+                          description:
+                            "System-generated key for a decision definition.",
+                          format: "DecisionDefinitionKey",
+                          example: "2251799813326547",
+                          type: "string",
+                          allOf: [
+                            {
+                              description:
+                                "Zeebe Engine resource key (Java long serialized as string)",
+                              type: "string",
+                              title: "LongKey",
+                            },
+                          ],
+                          title: "DecisionDefinitionKey",
+                        },
+                      ],
+                      description:
+                        "The assigned key, which acts as a unique identifier for this decision definition.",
+                    },
+                    decisionRequirementsKey: {
+                      allOf: [
+                        {
+                          allOf: [
+                            {
+                              description:
+                                "Zeebe Engine resource key (Java long serialized as string)",
+                              type: "string",
+                              title: "LongKey",
+                            },
+                          ],
+                          description:
+                            "System-generated key for a deployed decision requirements definition.",
+                          format: "DecisionRequirementsKey",
+                          example: "2251799813683346",
+                          type: "string",
+                          title: "DecisionRequirementsKey",
+                        },
+                      ],
+                      description:
+                        "The assigned key of the decision requirements graph that the decision definition is part of.",
+                    },
+                  },
+                  title: "DecisionDefinitionResult",
+                },
+              },
+            },
+            title: "DecisionDefinitionSearchQueryResult",
+          },
+        },
+      },
+    },
+    "400": {
+      description: "The provided data is not valid.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "401": {
+      description: "The request lacks valid authentication credentials.",
+      headers: { "WWW-Authenticate": { schema: { type: "string" } } },
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "403": {
+      description: "Forbidden. The request is not allowed.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "500": {
+      description: "An internal error occurred while processing the request.\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+  }}
+></StatusCodes>

@@ -1,40 +1,45 @@
 ---
 id: sql
-title: SQL Connector
-sidebar_label: SQL Connector
-description: "Connect your BPMN process with SQL databases, learn how to create a SQL Connector, and make it executable."
+title: SQL connector
+sidebar_label: SQL
+description: "Connect your BPMN process with SQL databases, learn how to create a SQL connector, and make it executable."
 ---
 
-The **SQL Connector** is an outbound Connector that allows you to connect your BPMN service with SQL databases (MariaDB, Microsoft SQL Server, PostgreSQL, MySQL).
+The **SQL connector** is an outbound connector that allows you to connect your BPMN service with SQL databases (MariaDB, Microsoft SQL Server, PostgreSQL, MySQL).
 
 ## Prerequisites
 
-To use the **SQL Connector**, ensure you have an SQL database instance running.
+To use the **SQL connector**, ensure you have an SQL database instance running.
 
-To avoid exposing your sensitive data as plain text, use Camunda secrets. Follow our documentation on [managing secrets](/components/console/manage-clusters/manage-secrets.md) to learn more.
+To avoid exposing your sensitive data as plain text, use secrets. Follow our documentation on [managing secrets](/components/hub/organization/manage-clusters/manage-secrets.md) to learn more.
 
-## Create an SQL Connector task
+## Create an SQL connector task
 
 import ConnectorTask from '../../../components/react-components/connector-task.md'
 
 <ConnectorTask/>
 
-## Make your SQL Connector executable
+## Make your SQL connector executable
 
-To make your **SQL Connector** executable, fill out the mandatory fields highlighted in red in the properties panel.
+To make your **SQL connector** executable, fill out the mandatory fields highlighted in red in the properties panel on the right side of the screen.
 
 ### Database
 
-Select the database type you want to connect to. The **SQL Connector** supports the following databases:
+Select the database type you want to connect to. The **SQL connector** supports the following databases:
 
 - MariaDB
 - Microsoft SQL Server
 - MySQL
 - PostgreSQL
+- **Oracle:** (See note below.)
+
+:::note
+The Oracle Database connector requires the Oracle JDBC driver, which Camunda cannot distribute due to licensing restrictions. To connect to an Oracle database, you must manually download the JDBC driver from [Oracle](https://www.oracle.com/database/technologies/appdev/jdbc-downloads.html) and run the connector in [hybrid mode](/components/connectors/use-connectors-in-hybrid-mode.md). When building a custom Docker image, include the driver by copying it into the image—for example, add `COPY ojdbc17.jar /opt/custom/` to your Dockerfile. This ensures the driver is on the classpath when the connector runtime starts.
+:::
 
 ### Connection
 
-The **SQL Connector** supports two types of connections:
+The **SQL connector** supports two types of connections:
 
 - [URI](#uri-connection): Use this option to connect to your database using a URI (similar to a connection string).
 - [Detailed](#detailed-connection): Use this option to connect to your database by providing detailed connection information (host, port, database name, username, password).
@@ -77,7 +82,6 @@ Use **[variables](#variables)** as much as possible to prevent SQL injection att
 #### Return results
 
 - When `false`, the response (see the [output](#what-is-the-output-format-of-the-sql-connector) section) will consist of an object containing an integer (`modifiedRows`) representing the number of modified rows. This is applicable for:
-
   - `INSERT`
   - `UPDATE`
   - `DELETE`
@@ -129,11 +133,11 @@ Variables need to be provided as a list or an object. We provide three ways to u
 
 ## Appendix & FAQ
 
-### How do I store secrets for my Connector?
+### How do I store secrets for my connector?
 
-Use Camunda secrets to avoid exposing your credentials. Follow our documentation on [managing secrets](/components/console/manage-clusters/manage-secrets.md) to learn more.
+Use secrets to avoid exposing your credentials. Follow our documentation on [managing secrets](/components/hub/organization/manage-clusters/manage-secrets.md) to learn more.
 
-### What is the output format of the SQL Connector?
+### What is the output format of the SQL connector?
 
 Depending on the type of query you execute, the response will contain either the number of modified rows (an object with a `modifiedRows` attribute) or the result set (an object with a `resultSet` attribute).
 

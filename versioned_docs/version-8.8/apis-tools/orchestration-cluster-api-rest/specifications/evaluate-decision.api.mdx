@@ -1,0 +1,704 @@
+---
+id: evaluate-decision
+title: "Evaluate decision"
+description: "<MarkerStronglyConsistentExtension />"
+sidebar_label: "Evaluate decision"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: versioned_docs/version-8.8/apis-tools/orchestration-cluster-api-rest/specifications/orchestration-cluster-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MarkerStronglyConsistentExtension from "@site/src/mdx/MarkerStronglyConsistentExtension";
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Evaluate decision"}
+></Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/decision-definitions/evaluation"}
+  context={"endpoint"}
+></MethodEndpoint>
+
+<MarkerStronglyConsistentExtension />
+
+Evaluates a decision.
+You specify the decision to evaluate either by using its unique key (as returned by
+DeployResource), or using the decision ID. When using the decision ID, the latest deployed
+version of the decision is used.
+
+<Heading id={"request"} as={"h2"} className={"openapi-tabs__heading"}>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails parameters={undefined}></ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{
+    required: true,
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          oneOf: [
+            {
+              type: "object",
+              title: "Decision evaluation by ID",
+              properties: {
+                decisionDefinitionId: {
+                  description:
+                    "The ID of the decision to be evaluated.\nWhen using the decision ID, the latest\ndeployed version of the decision is used.\n",
+                  allOf: [
+                    {
+                      description:
+                        "Id of a decision definition, from the model. Only ids of decision definitions that are deployed are useful.",
+                      format: "DecisionDefinitionId",
+                      type: "string",
+                      example: "new-hire-onboarding-workflow",
+                      title: "DecisionDefinitionId",
+                    },
+                  ],
+                },
+                variables: {
+                  description: "The message variables as JSON document.",
+                  additionalProperties: true,
+                  type: "object",
+                },
+                tenantId: {
+                  description: "The tenant ID of the decision.",
+                  allOf: [
+                    {
+                      example: "customer-service",
+                      description: "The unique identifier of the tenant.",
+                      format: "TenantId",
+                      type: "string",
+                      title: "TenantId",
+                    },
+                  ],
+                },
+              },
+              required: ["decisionDefinitionId"],
+            },
+            {
+              type: "object",
+              title: "Decision evaluation by key",
+              properties: {
+                decisionDefinitionKey: {
+                  description:
+                    "System-generated key for a decision definition.",
+                  format: "DecisionDefinitionKey",
+                  example: "2251799813326547",
+                  type: "string",
+                  allOf: [
+                    {
+                      description:
+                        "Zeebe Engine resource key (Java long serialized as string)",
+                      type: "string",
+                      title: "LongKey",
+                    },
+                  ],
+                  title: "DecisionDefinitionKey",
+                },
+                variables: {
+                  description: "The message variables as JSON document.",
+                  additionalProperties: true,
+                  type: "object",
+                },
+                tenantId: {
+                  description: "The tenant ID of the decision.",
+                  allOf: [
+                    {
+                      example: "customer-service",
+                      description: "The unique identifier of the tenant.",
+                      format: "TenantId",
+                      type: "string",
+                      title: "TenantId",
+                    },
+                  ],
+                },
+              },
+              required: ["decisionDefinitionKey"],
+            },
+          ],
+          title: "DecisionEvaluationInstruction",
+        },
+        examples: {
+          "By decision definition key": {
+            summary: "Evaluate the decision by decisionDefinitionKey.",
+            value: { decisionDefinitionKey: "12345", variables: {} },
+          },
+          "By decision definition ID": {
+            summary: "Evaluate the decision by decisionDefinitionId.",
+            value: { decisionDefinitionId: "1234-5678", variables: {} },
+          },
+        },
+      },
+    },
+  }}
+></RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{
+    "200": {
+      description: "The decision was evaluated.",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: [
+              "decisionDefinitionId",
+              "decisionDefinitionName",
+              "decisionDefinitionVersion",
+              "decisionRequirementsId",
+              "output",
+              "failedDecisionDefinitionId",
+              "failureMessage",
+              "decisionDefinitionKey",
+              "tenantId",
+              "decisionRequirementsKey",
+              "decisionEvaluationKey",
+              "evaluatedDecisions",
+            ],
+            properties: {
+              decisionDefinitionId: {
+                description: "The ID of the decision which was evaluated.",
+                allOf: [
+                  {
+                    description:
+                      "Id of a decision definition, from the model. Only ids of decision definitions that are deployed are useful.",
+                    format: "DecisionDefinitionId",
+                    type: "string",
+                    example: "new-hire-onboarding-workflow",
+                    title: "DecisionDefinitionId",
+                  },
+                ],
+              },
+              decisionDefinitionName: {
+                description: "The name of the decision which was evaluated.",
+                type: "string",
+              },
+              decisionDefinitionVersion: {
+                description: "The version of the decision which was evaluated.",
+                type: "integer",
+                format: "int32",
+              },
+              decisionRequirementsId: {
+                description:
+                  "The ID of the decision requirements graph that the decision which was evaluated is part of.",
+                type: "string",
+              },
+              output: {
+                description:
+                  "JSON document that will instantiate the result of the decision which was evaluated.\n",
+                type: "string",
+              },
+              failedDecisionDefinitionId: {
+                description:
+                  "The ID of the decision which failed during evaluation.",
+                allOf: [
+                  {
+                    description:
+                      "Id of a decision definition, from the model. Only ids of decision definitions that are deployed are useful.",
+                    format: "DecisionDefinitionId",
+                    type: "string",
+                    example: "new-hire-onboarding-workflow",
+                    title: "DecisionDefinitionId",
+                  },
+                ],
+              },
+              failureMessage: {
+                description:
+                  "Message describing why the decision which was evaluated failed.",
+                type: "string",
+              },
+              tenantId: {
+                description: "The tenant ID of the evaluated decision.",
+                allOf: [
+                  {
+                    example: "customer-service",
+                    description: "The unique identifier of the tenant.",
+                    format: "TenantId",
+                    type: "string",
+                    title: "TenantId",
+                  },
+                ],
+              },
+              decisionDefinitionKey: {
+                allOf: [
+                  {
+                    description:
+                      "System-generated key for a decision definition.",
+                    format: "DecisionDefinitionKey",
+                    example: "2251799813326547",
+                    type: "string",
+                    allOf: [
+                      {
+                        description:
+                          "Zeebe Engine resource key (Java long serialized as string)",
+                        type: "string",
+                        title: "LongKey",
+                      },
+                    ],
+                    title: "DecisionDefinitionKey",
+                  },
+                ],
+                description:
+                  "The unique key identifying the decision which was evaluated.",
+              },
+              decisionRequirementsKey: {
+                allOf: [
+                  {
+                    allOf: [
+                      {
+                        description:
+                          "Zeebe Engine resource key (Java long serialized as string)",
+                        type: "string",
+                        title: "LongKey",
+                      },
+                    ],
+                    description:
+                      "System-generated key for a deployed decision requirements definition.",
+                    format: "DecisionRequirementsKey",
+                    example: "2251799813683346",
+                    type: "string",
+                    title: "DecisionRequirementsKey",
+                  },
+                ],
+                description:
+                  "The unique key identifying the decision requirements graph that the decision which was evaluated is part of.",
+              },
+              decisionInstanceKey: {
+                allOf: [
+                  {
+                    allOf: [
+                      {
+                        description:
+                          "Zeebe Engine resource key (Java long serialized as string)",
+                        type: "string",
+                        title: "LongKey",
+                      },
+                    ],
+                    description:
+                      "System-generated key for a deployed decision instance.",
+                    format: "DecisionInstanceKey",
+                    example: "22517998136843567",
+                    type: "string",
+                    title: "DecisionInstanceKey",
+                  },
+                ],
+                description:
+                  "Deprecated, please refer to `decisionEvaluationKey`.",
+                deprecated: true,
+              },
+              decisionEvaluationKey: {
+                description:
+                  "The unique key identifying this decision evaluation.",
+                allOf: [
+                  {
+                    allOf: [
+                      {
+                        description:
+                          "Zeebe Engine resource key (Java long serialized as string)",
+                        type: "string",
+                        title: "LongKey",
+                      },
+                    ],
+                    description:
+                      "System-generated key for a decision evaluation.",
+                    format: "DecisionEvaluationKey",
+                    example: "2251792362345323",
+                    type: "string",
+                    title: "DecisionEvaluationKey",
+                  },
+                ],
+              },
+              evaluatedDecisions: {
+                description:
+                  "Decisions that were evaluated within the requested decision evaluation.",
+                type: "array",
+                items: {
+                  type: "object",
+                  description: "A decision that was evaluated.",
+                  properties: {
+                    decisionDefinitionId: {
+                      description:
+                        "The ID of the decision which was evaluated.",
+                      allOf: [
+                        {
+                          description:
+                            "Id of a decision definition, from the model. Only ids of decision definitions that are deployed are useful.",
+                          format: "DecisionDefinitionId",
+                          type: "string",
+                          example: "new-hire-onboarding-workflow",
+                          title: "DecisionDefinitionId",
+                        },
+                      ],
+                    },
+                    decisionDefinitionName: {
+                      description:
+                        "The name of the decision which was evaluated.",
+                      type: "string",
+                    },
+                    decisionDefinitionVersion: {
+                      description:
+                        "The version of the decision which was evaluated.",
+                      type: "integer",
+                      format: "int32",
+                    },
+                    decisionDefinitionType: {
+                      description:
+                        "The type of the decision which was evaluated.",
+                      type: "string",
+                    },
+                    output: {
+                      description:
+                        "JSON document that will instantiate the result of the decision which was evaluated.\n",
+                      type: "string",
+                    },
+                    tenantId: {
+                      description: "The tenant ID of the evaluated decision.",
+                      allOf: [
+                        {
+                          example: "customer-service",
+                          description: "The unique identifier of the tenant.",
+                          format: "TenantId",
+                          type: "string",
+                          title: "TenantId",
+                        },
+                      ],
+                    },
+                    matchedRules: {
+                      description:
+                        "The decision rules that matched within this decision evaluation.",
+                      type: "array",
+                      items: {
+                        type: "object",
+                        description:
+                          "A decision rule that matched within this decision evaluation.",
+                        properties: {
+                          ruleId: {
+                            description: "The ID of the matched rule.",
+                            type: "string",
+                          },
+                          ruleIndex: {
+                            description: "The index of the matched rule.",
+                            type: "integer",
+                            format: "int32",
+                          },
+                          evaluatedOutputs: {
+                            description: "The evaluated decision outputs.",
+                            type: "array",
+                            items: {
+                              type: "object",
+                              description: "The evaluated decision outputs.",
+                              properties: {
+                                outputId: {
+                                  description:
+                                    "The ID of the evaluated decision output.",
+                                  type: "string",
+                                },
+                                outputName: {
+                                  description:
+                                    "The name of the evaluated decision output.",
+                                  type: "string",
+                                },
+                                outputValue: {
+                                  description:
+                                    "The value of the evaluated decision output.",
+                                  type: "string",
+                                },
+                              },
+                              title: "EvaluatedDecisionOutputItem",
+                            },
+                          },
+                        },
+                        title: "MatchedDecisionRuleItem",
+                      },
+                    },
+                    evaluatedInputs: {
+                      description:
+                        "The decision inputs that were evaluated within this decision evaluation.",
+                      type: "array",
+                      items: {
+                        type: "object",
+                        description:
+                          "A decision input that was evaluated within this decision evaluation.",
+                        properties: {
+                          inputId: {
+                            description:
+                              "The ID of the evaluated decision input.",
+                            type: "string",
+                          },
+                          inputName: {
+                            description:
+                              "The name of the evaluated decision input.",
+                            type: "string",
+                          },
+                          inputValue: {
+                            description:
+                              "The value of the evaluated decision input.",
+                            type: "string",
+                          },
+                        },
+                        title: "EvaluatedDecisionInputItem",
+                      },
+                    },
+                    decisionDefinitionKey: {
+                      allOf: [
+                        {
+                          description:
+                            "System-generated key for a decision definition.",
+                          format: "DecisionDefinitionKey",
+                          example: "2251799813326547",
+                          type: "string",
+                          allOf: [
+                            {
+                              description:
+                                "Zeebe Engine resource key (Java long serialized as string)",
+                              type: "string",
+                              title: "LongKey",
+                            },
+                          ],
+                          title: "DecisionDefinitionKey",
+                        },
+                      ],
+                      description:
+                        "The unique key identifying the decision which was evaluate.",
+                    },
+                    decisionEvaluationInstanceKey: {
+                      allOf: [
+                        {
+                          description:
+                            "System-generated key for a decision evaluation instance.",
+                          format: "DecisionEvaluationInstanceKey",
+                          type: "string",
+                          example: "2251799813684367-1",
+                          title: "DecisionEvaluationInstanceKey",
+                        },
+                      ],
+                      description:
+                        "The unique key identifying this decision evaluation instance.",
+                    },
+                  },
+                  title: "EvaluatedDecisionResult",
+                },
+              },
+            },
+            title: "EvaluateDecisionResult",
+          },
+        },
+      },
+    },
+    "400": {
+      description: "The provided data is not valid.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "404": {
+      description: "The decision is not found.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "500": {
+      description: "An internal error occurred while processing the request.\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "503": {
+      description:
+        "The service is currently unavailable. This may happen only on some requests where the system creates backpressure to prevent the server's compute resources from being exhausted, avoiding more severe failures. In this case, the title of the error object contains `RESOURCE_EXHAUSTED`. Clients are recommended to eventually retry those requests after a backoff period. You can learn more about the backpressure mechanism here: https://docs.camunda.io/docs/components/zeebe/technical-concepts/internal-processing/#handling-backpressure .\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+  }}
+></StatusCodes>

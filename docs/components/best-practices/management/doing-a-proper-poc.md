@@ -1,7 +1,5 @@
 ---
 title: Doing a proper POC
-tags:
-  - POC
 description: "When evaluating your process automation approach, a POC helps check if the method and technology suit your needs."
 ---
 
@@ -16,7 +14,7 @@ With a POC, you create a prototype application within no more than _three to fiv
 - How can you _model_ a specific business domain problem?
 - Which kind of _know how_ is needed for the business and development teams?
 - Which _effort_ will typically be needed for these kinds of projects?
-- What are the impacts of process applications for _operations_?
+- What are the impacts of projects for _operations_?
 
 Often, it does make sense to implement such a POC together with Camunda, our partners, or specialized consultants to get quick results and focused feedback with respect to your specific challenges. However, you should always at least _co-develop_ the POC yourself to really understand what is going on. A team size of two to four people has proven to be quite optimal.
 
@@ -61,11 +59,7 @@ Define a _moderator_ to avoid too many detours and keep your POC on track.
 
 ### Planning the technical environment
 
-:::caution Camunda 8
-This best practice targets Camunda 8. If you want to run a POC with Camunda 7, visit [deciding about your Camunda 7 stack](../../architecture/deciding-about-your-stack-c7/).
-:::
-
-Make the necessary technological choices. Typically, POCs _run on Camunda 8 SaaS_ unless your goal is to validate that Camunda 8 runs in your Kubernetes environment in a self-managed fashion. A simple test account is often sufficient, unless your goal is to do load or performance tests, for which you need bigger clusters. Reach out to us in such cases.
+Make the necessary technological choices. Typically, POCs _run on Camunda 8 SaaS_ unless your goal is to validate that Camunda 8 runs in your Kubernetes environment in a self-managed fashion. A simple test account is often sufficient, unless your goal is to do load or performance tests, for which you need bigger clusters. Reach out to us in such cases. If your POC includes [AI agents](/reference/glossary.md#ai-agent), SaaS also gives you [Camunda-provided LLM](/components/agentic-orchestration/camunda-provided-llm.md), so you can run them within a provided budget instead of setting up an LLM provider account first.
 
 To access _third party systems_ during your POC, set up proper test systems for those and verify that they are usable.
 
@@ -95,10 +89,9 @@ The speaker might also be your Camunda Consultant - they are used to presenting 
 - _Cloud Access_: Make sure you have an account for Camunda 8 with an active subscription or trial account.
 
 - _Installations_: Make sure your _developer systems_, as well as any _target systems_ for the POC test and production you wish to use are set up. In particular install:
-
   - Camunda _Modeler_ (https://camunda.org/download/modeler/)
   - Java, Maven, and your favorite IDE (e.g. Eclipse)
-  - Make sure _Maven_ runs and builds and it can access all necessary dependencies. [Download and build this project](https://github.com/camunda/camunda-platform-tutorials/tree/main/quick-start/microservice%20orchestration/worker-java) to verify that your build runs.
+  - Make sure _Maven_ runs and builds and it can access all necessary dependencies. [Download and build this project](https://github.com/camunda/camunda-platform-tutorials/tree/main/quick-start/microservice-orchestration/worker-java) to verify that your build runs.
 
 - _Developer Computers_: For maximum productivity, all participating developers should use the computer with which they work every day. Avoid using computers from a training room or shared laptops unless they allow a remote connection to the developer's personal computer. If the developer's computers are neither portable nor remotely accessible consider conducting the POC in the regular office space of the developers. If your company network is restricting access to Maven and Git repositories on the internet, consider using laptops that are not connected to the company network. Similarly, you should not force the external consultants to work on one of your computers. They will be twice as productive on their laptops and not lose time with software setup, configuration, and access restrictions. Obviously, you do not have to connect the consultant's laptop to your company network. Internet access and a shared code repository are enough to collaborate.
 
@@ -115,7 +108,6 @@ Inform all POC team members and other relevant stakeholders about the following:
 - _Names and roles_ of all involved _people_
 
 - For onsite POCs:
-
   - Exact _location/address_ at which the POC is taking place as well as instructions about how to find together when arriving (for onsite POCs)
   - _Projector_, white-board, and flip-chart availability
   - _Internet_ availability for team members and external consultants

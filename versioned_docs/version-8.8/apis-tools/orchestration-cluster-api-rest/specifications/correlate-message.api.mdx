@@ -1,0 +1,410 @@
+---
+id: correlate-message
+title: "Correlate message"
+description: "<MarkerStronglyConsistentExtension />"
+sidebar_label: "Correlate message"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: versioned_docs/version-8.8/apis-tools/orchestration-cluster-api-rest/specifications/orchestration-cluster-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MarkerStronglyConsistentExtension from "@site/src/mdx/MarkerStronglyConsistentExtension";
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Correlate message"}
+></Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/messages/correlation"}
+  context={"endpoint"}
+></MethodEndpoint>
+
+<MarkerStronglyConsistentExtension />
+
+Publishes a message and correlates it to a subscription.
+If correlation is successful it will return the first process instance key the message correlated with.
+The message is not buffered.
+Use the publish message endpoint to send messages that can be buffered.
+
+<Heading id={"request"} as={"h2"} className={"openapi-tabs__heading"}>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails parameters={undefined}></ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{
+    required: true,
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          required: ["name"],
+          properties: {
+            name: {
+              description: "The message name as defined in the BPMN process\n",
+              type: "string",
+            },
+            correlationKey: {
+              description: "The correlation key of the message.",
+              type: "string",
+              example: "customer-43421",
+              default: "",
+            },
+            variables: {
+              description: "The message variables as JSON document",
+              additionalProperties: true,
+              type: "object",
+            },
+            tenantId: {
+              description: "the tenant for which the message is published",
+              allOf: [
+                {
+                  example: "customer-service",
+                  description: "The unique identifier of the tenant.",
+                  format: "TenantId",
+                  type: "string",
+                  title: "TenantId",
+                },
+              ],
+            },
+          },
+          title: "MessageCorrelationRequest",
+        },
+      },
+    },
+  }}
+></RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{
+    "200": {
+      description: "The message is correlated to one or more process instances",
+      content: {
+        "application/json": {
+          schema: {
+            description:
+              "The message key of the correlated message, as well as the first process instance key it\ncorrelated with.\n",
+            type: "object",
+            properties: {
+              tenantId: {
+                description: "The tenant ID of the correlated message",
+                allOf: [
+                  {
+                    example: "customer-service",
+                    description: "The unique identifier of the tenant.",
+                    format: "TenantId",
+                    type: "string",
+                    title: "TenantId",
+                  },
+                ],
+              },
+              messageKey: {
+                allOf: [
+                  {
+                    allOf: [
+                      {
+                        description:
+                          "Zeebe Engine resource key (Java long serialized as string)",
+                        type: "string",
+                        title: "LongKey",
+                      },
+                    ],
+                    description: "System-generated key for an message.",
+                    format: "MessageKey",
+                    example: "2251799813683467",
+                    type: "string",
+                    title: "MessageKey",
+                  },
+                ],
+                description: "The key of the correlated message",
+              },
+              processInstanceKey: {
+                description:
+                  "The key of the first process instance the message correlated with",
+                allOf: [
+                  {
+                    description: "System-generated key for a process instance.",
+                    format: "ProcessInstanceKey",
+                    example: "2251799813690746",
+                    type: "string",
+                    allOf: [
+                      {
+                        description:
+                          "Zeebe Engine resource key (Java long serialized as string)",
+                        type: "string",
+                        title: "LongKey",
+                      },
+                    ],
+                    title: "ProcessInstanceKey",
+                  },
+                ],
+              },
+            },
+            title: "MessageCorrelationResult",
+          },
+        },
+      },
+    },
+    "400": {
+      description: "The provided data is not valid.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "403": {
+      description: "Forbidden. The request is not allowed.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "404": {
+      description: "Not found",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "500": {
+      description: "An internal error occurred while processing the request.\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "503": {
+      description:
+        "The service is currently unavailable. This may happen only on some requests where the system creates backpressure to prevent the server's compute resources from being exhausted, avoiding more severe failures. In this case, the title of the error object contains `RESOURCE_EXHAUSTED`. Clients are recommended to eventually retry those requests after a backoff period. You can learn more about the backpressure mechanism here: https://docs.camunda.io/docs/components/zeebe/technical-concepts/internal-processing/#handling-backpressure .\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+  }}
+></StatusCodes>

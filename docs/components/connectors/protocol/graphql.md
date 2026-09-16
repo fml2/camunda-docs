@@ -1,25 +1,25 @@
 ---
 id: graphql
-title: GraphQL Connector
-sidebar_label: GraphQL Connector
+title: GraphQL connector
+sidebar_label: GraphQL
 description: Execute a GraphQL query or mutation from your BPMN process.
 ---
 
-The **GraphQL Connector** is an outbound protocol Connector that allows you to execute a GraphQL query or mutation from your BPMN process.
+The **GraphQL connector** is an outbound protocol connector that allows you to execute a GraphQL query or mutation from your BPMN process.
 
 ## Prerequisites
 
-The GraphQL Connector allows you to connect to a GraphQL API endpoint. To use the GraphQL Connector, you need to know the GraphQL endpoint URL, authentication, and available API methods.
+The GraphQL connector allows you to connect to a GraphQL API endpoint. To use the GraphQL connector, you need to know the GraphQL endpoint URL, authentication, and available API methods.
 
-## Create a GraphQL Connector task
+## Create a GraphQL connector task
 
 import ConnectorTask from '../../../components/react-components/connector-task.md'
 
 <ConnectorTask/>
 
-## Make your GraphQL Connector executable
+## Make your GraphQL connector executable
 
-To make the **GraphQL Connector** executable, fill out the mandatory fields highlighted in red in the properties panel:
+To make the **GraphQL connector** executable, fill out the mandatory fields highlighted in red in the properties panel on the right side of the screen.
 
 :::note
 All the mandatory and non-mandatory fields are covered in the upcoming sections. Depending on the authentication selection you make, more fields might be required; this is covered in the next section.
@@ -35,16 +35,16 @@ Click **None** in the **Authentication** section. No extra authentication config
 
 ### Basic
 
-#### Create a new Connector secret
+#### Create a new connector secret
 
 We advise you to keep your **Password** safe and avoid exposing it in the BPMN `xml` file by creating a secret:
 
-1. Follow our [guide for creating secrets](/components/console/manage-clusters/manage-secrets.md).
-2. Name your secret (i.e `GRAPHQL_PASSWORD`) so you can reference it later in the Connector.
+1. Follow our [guide for creating secrets](/components/hub/organization/manage-clusters/manage-secrets.md).
+2. Name your secret (i.e `GRAPHQL_PASSWORD`) so you can reference it later in the connector.
 
 ### Configure Basic Authentication
 
-Select the **GraphQL Connector** and fill out the following properties under the **Authentication** section:
+Select the **GraphQL connector** and fill out the following properties under the **Authentication** section:
 
 1. Click **Basic** in the **Authentication** section.
 2. Set **Username** (i.e. `{{secrets.GRAPHQL_USERNAME}}`).
@@ -52,32 +52,32 @@ Select the **GraphQL Connector** and fill out the following properties under the
 
 ### Bearer Token
 
-#### Create a new Connector secret
+#### Create a new connector secret
 
 We advise you to keep your **Bearer Token** safe and avoid exposing it in the BPMN `xml` file by creating a secret:
 
-1. Follow our [guide for creating secrets](/components/console/manage-clusters/manage-secrets.md).
-2. Name your secret (i.e `GRAPHQL_BEARER_TOKEN`) so you can reference it later in the Connector.
+1. Follow our [guide for creating secrets](/components/hub/organization/manage-clusters/manage-secrets.md).
+2. Name your secret (i.e `GRAPHQL_BEARER_TOKEN`) so you can reference it later in the connector.
 
 #### Configure the Bearer Token
 
-Select the **GraphQL Connector** and fill out the following properties under the **Authentication** section:
+Select the **GraphQL connector** and fill out the following properties under the **Authentication** section:
 
 1. Click **Bearer Token** in the **Authentication** section.
 2. Set **Bearer** to the secret you created (i.e. `{{secrets.GRAPHQL_BEARER_TOKEN}}`).
 
 ### OAuth token
 
-#### Create a new Connector secret
+#### Create a new connector secret
 
 We advise you to keep your **OAUTH_TOKEN_ENDPOINT** safe and avoid exposing it in the BPMN `xml` file by creating a secret:
 
-1. Follow our [guide for creating secrets](/components/console/manage-clusters/manage-secrets.md).
-2. Name your secret (i.e `OAUTH_TOKEN_ENDPOINT`) so you can reference it later in the Connector.
+1. Follow our [guide for creating secrets](/components/hub/organization/manage-clusters/manage-secrets.md).
+2. Name your secret (i.e `OAUTH_TOKEN_ENDPOINT`) so you can reference it later in the connector.
 
 #### Configure the OAuth Token
 
-Select the **GraphQL Connector** and fill out the following properties under the **Authentication** section:
+Select the **GraphQL connector** and fill out the following properties under the **Authentication** section:
 
 1. Click **OAuth 2.0** in the **Authentication** section.
 2. Set **OAuth Token Endpoint** to the secret you created (i.e. `{{secrets.OAUTH_TOKEN_ENDPOINT}}`).
@@ -112,7 +112,7 @@ query Root($id: ID) {
 ```
 
 :::note
-Secrets are currently not supported in the **Query/Mutation** of a GraphQL Connector.
+Secrets are currently not supported in the **Query/Mutation** of a GraphQL connector.
 :::
 
 :::note
@@ -185,8 +185,6 @@ Variables:
 
 - **Read timeout in seconds** is the amount of time the client will wait to read data from the server after the connection has been made. The default is also set to 20 seconds. To allow an unlimited wait time for slow responses, set this to 0.
 
-- **Write timeout in seconds** controls how long the client will wait to successfully send data to the server. The default setting for this is 0, indicating that there is no limit and the client will wait indefinitely for the operation to complete.
-
 ## Response mapping
 
 The HTTP response will be available in a temporary local `response` variable. This variable can be mapped to the process by specifying the **Result Variable**.
@@ -194,8 +192,21 @@ The HTTP response will be available in a temporary local `response` variable. Th
 The following fields are available in the `response` variable:
 
 - **status**: Response status
-- **body**: Response body of your request
+- **body**: Response body of your request. Populated when the **Response format** is **As text** or **As JSON**.
 - **headers**: Response headers
+- **document**: Populated when the **Response format** is **Document reference**; a reference to the response stored in the Camunda document store.
+
+### Response format
+
+Choose how the response body is returned with the **Response format** dropdown, a [return format](/components/document-handling/send-document-to-external-system.md#return-formats):
+
+- **As JSON** (default): the body is parsed as JSON and returned in `body`.
+- **As text**: the body is decoded as a string (with an optional encoding, default UTF-8) and returned in `body`.
+- **Document reference**: the body is streamed to the Camunda document store and a reference is returned in `document`.
+
+:::note
+The **As JSON** default fails the job when the response body is not valid JSON. Use **As text** for non-JSON responses. **As text** and **As JSON** are subject to a size guard (approximately 1.5 MiB); use **Document reference** for large responses.
+:::
 
 Additionally, you can choose to unpack the content of your `response` into multiple process variables using the **Result Expression**, which is a [FEEL Context Expression](/components/modeler/feel/language-guide/feel-context-expressions.md).
 

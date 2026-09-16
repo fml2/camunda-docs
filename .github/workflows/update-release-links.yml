@@ -1,0 +1,117 @@
+name: Update Release Links
+
+on:
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-release-links:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run release links update
+        id: update-links
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run update-release-links
+
+          # Check if there are any changes
+          if git diff --quiet; then
+            echo "No changes detected"
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected"
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+            
+            # Get list of changed files
+            CHANGED_FILES=$(git diff --name-only | tr '\n' ' ')
+            echo "changed_files=${CHANGED_FILES}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Import Secrets
+        id: secrets
+        uses: hashicorp/vault-action@79632e33d6953d190b940ffa440bf97821cabd80
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          method: approle
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          exportEnv: false
+          secrets: |
+            secret/data/products/camunda-docs/github/apps/camunda-docs-pr-automation APP_ID;
+            secret/data/products/camunda-docs/github/apps/camunda-docs-pr-automation APP_PRIVATE_KEY;
+
+      - name: Generate GitHub App token
+        id: generate_token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ steps.secrets.outputs.APP_ID }}
+          private-key: ${{ steps.secrets.outputs.APP_PRIVATE_KEY }}
+
+      - name: Create Pull Request
+        if: steps.update-links.outputs.changes_detected == 'true'
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+          commit-message: "docs: update release links in release notes"
+          title: "🔗 Auto-update release links in release notes"
+          body: |
+            This PR was automatically created by the nightly release links update automation.
+
+            ## Changes
+
+            The script has updated the following files with missing release links:
+            ${{ steps.update-links.outputs.changed_files }}
+
+            ## What was updated
+
+            - ✅ Fetched latest stable releases from camunda/camunda and camunda/connectors repositories
+            - ✅ Excluded alpha releases and pre-releases
+            - ✅ Updated release notes files where changelog links were missing or incomplete
+
+            ---
+
+            🤖 This PR was created automatically. If you have any questions about the automation, please check the [update-release-links.js script](./hacks/update-release-links.js).
+          branch: auto/update-release-links
+          delete-branch: true
+          team-reviewers: camunda/tech-writers
+
+      - name: Log automation result
+        run: |
+          if [ "${{ steps.update-links.outputs.changes_detected }}" == "true" ]; then
+            echo "✅ Release links update automation completed successfully. PR created."
+          else
+            echo "ℹ️ No updates needed. All release links are up to date."
+          fi
+  notify-failure:
+    needs:
+      - update-release-links
+    if: failure() || (success() && fromJSON(github.run_attempt) > 1)
+    uses: ./.github/workflows/notify-failure.yml
+    with:
+      # If any dependent job fails, set the dependency_status to 'failure',
+      # otherwise set it to 'success'.
+      dependency_status: ${{ contains(needs.*.result, 'failure') && 'failure' || 'success' }}
+    secrets:
+      VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+      VAULT_ROLE_ID: ${{ secrets.VAULT_ROLE_ID }}
+      VAULT_SECRET_ID: ${{ secrets.VAULT_SECRET_ID }}

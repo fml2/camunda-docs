@@ -6,9 +6,32 @@ sidebar_position: 2
 description: "The Zeebe client gRPC API is exposed through a single gateway service."
 ---
 
-The Zeebe client gRPC API is exposed through a single gateway service. The current version of the protocol buffer file
-can be found in
-the [Zeebe repository](https://github.com/camunda/camunda/blob/main/zeebe/gateway-protocol/src/main/proto/gateway.proto).
+The Zeebe client gRPC API is exposed through a single gateway service. The current version of the protocol buffer file can be found in the [Zeebe repository](https://github.com/camunda/camunda/blob/main/zeebe/gateway-protocol/src/main/proto/gateway.proto).
+
+## Default service config
+
+Along with the gateway protocol definition, the gateway service also bundles a [default service configuration file](https://github.com/camunda/camunda/blob/main/zeebe/gateway-protocol-impl/src/main/resources/gateway-service-config.json).
+This file can be used as is, or as a template to create your own, and defines default retry strategies on a per-RPC basis: when to retry (based on error code), how often, how soon, etc.
+This file is also loaded by the [Camunda Java client](../java-client/getting-started.md) if `useDefaultRetryPolicy` is set to true.
+
+:::note
+Read more about [service configuration files](https://github.com/grpc/grpc/blob/master/doc/service_config.md). These files are especially useful
+when using the Camunda protocol in languages without, or with less feature-rich clients and SDKs.
+:::
+
+Usage of this file largely depends on the gRPC bindings for your language of choice. For example, when using Java, you would programmatically configure your
+client using:
+
+```java
+final ObjectMapper objectMapper = new ObjectMapper();
+final File configFile = new File("gateway-service-config.json");
+final Map<String, Object> serviceConfig = objectMapper.readValue(
+      configFile, new TypeReference<Map<String, Object>>() {});
+final ManagedChannelBuilder<?> channelBuilder = ManagedChannelBuilder.forAddress("localhost", 26500);
+
+channelBuilder.defaultServiceConfig(serviceConfig);
+channelBuilder.enableRetry();
+```
 
 ## `ActivateJobs` RPC
 
@@ -36,10 +59,26 @@ message ActivateJobsRequest {
   // if the requestTimeout = 0, a default timeout is used.
   // if the requestTimeout < 0, long polling is disabled and the request is completed immediately, even when no job is activated.
   int64 requestTimeout = 6;
-  // a list of tenant IDs for which to activate jobs
+  // a list of IDs of tenants for which to activate jobs
   repeated string tenantIds = 7;
+  // whether to activate the jobs with a lease; when true, each activated job is assigned a
+  // distinct, opaque lease token, returned as ActivatedJob.leaseToken. The lease fences the
+  // complete, fail, and throw-error commands against a superseded activation of the same job
+  // (e.g. after the job timed out or failed and was re-activated by another worker): a command
+  // carrying a stale lease token is rejected rather than racing with the newer activation. Once
+  // a job has been activated with a lease, it is served only to leasing workers of that job
+  // type; a homogeneous fleet per job type is recommended. Defaults to false, which activates
+  // jobs without a lease.
+  bool withLease = 9;
 }
 ```
+
+If `requestTimeout` is set to `0`, the effective timeout depends on whether long polling is enabled:
+
+- If long polling is enabled, the gateway uses its configured long-polling timeout (`camunda.api.long-polling.timeout` / `zeebe.gateway.longPolling.timeout`, default 10,000 ms).
+- If long polling is disabled, the request falls back to a client-side timeout. For gRPC clients, this currently defaults to 10,000 ms.
+
+If `requestTimeout` is set to a value less than `0`, long polling is disabled and the request completes immediately, even when no job is activated.
 
 ### Output: `ActivateJobsResponse`
 
@@ -50,6 +89,25 @@ message ActivateJobsResponse {
 }
 
 message ActivatedJob {
+  // Describes the kind of job.
+  enum JobKind {
+    BPMN_ELEMENT = 0;
+    EXECUTION_LISTENER = 1;
+    TASK_LISTENER = 2;
+  }
+
+  // Describes the listener event type of the job.
+  enum ListenerEventType {
+    ASSIGNING = 0;
+    CANCELING = 1;
+    COMPLETING = 2;
+    CREATING = 3;
+    END = 4;
+    START = 5;
+    UNSPECIFIED = 6;
+    UPDATING = 7;
+  }
+
   // the key, a unique identifier for the job
   int64 key = 1;
   // the type of the job (should match what was requested)
@@ -79,8 +137,15 @@ message ActivatedJob {
   // JSON document, computed at activation time, consisting of all visible variables to
   // the task scope
   string variables = 13;
-  // the id of the tenant that owns the job
+  // the ID of the tenant that owns the job
   string tenantId = 14;
+  // the kind of the job.
+  JobKind kind = 15;
+  // the listener event type of the job.
+  ListenerEventType listenerEventType = 16;
+  // the lease token identifying this activation; unset when the job was activated without a
+  // lease
+  optional string leaseToken = 21;
 }
 ```
 
@@ -118,7 +183,7 @@ message BroadcastSignalRequest {
   // the signal variables as a JSON document; to be valid, the root of the document must be an
   // object, e.g. { "a": "foo" }. [ "foo" ] would not be valid.
   string variables = 2;
-  // the id of the tenant that owns the signal.
+  // the ID of the tenant that owns the signal.
   string tenantId = 3;
 }
 ```
@@ -129,7 +194,7 @@ message BroadcastSignalRequest {
 message BroadcastSignalResponse {
   // the unique ID of the signal that was broadcasted.
   int64 key = 1;
-  // the tenant id of the signal that was broadcasted.
+  // the tenant ID of the signal that was broadcasted.
   string tenantId = 2;
 }
 ```
@@ -160,8 +225,6 @@ message CancelProcessInstanceRequest {
   // the process instance key (as, for example, obtained from
   // CreateProcessInstanceResponse)
   int64 processInstanceKey = 1;
-  // a reference key chosen by the user and will be part of all records resulting from this operation
-  optional uint64 operationReference = 2;
 }
 ```
 
@@ -193,6 +256,76 @@ message CompleteJobRequest {
   int64 jobKey = 1;
   // a JSON document representing the variables in the current task scope
   string variables = 2;
+  // The result of the completed job as determined by the worker.
+  // This functionality is currently supported only by user task listeners
+  optional JobResult result = 3;
+  // the token identifying a leased job's activation, obtained from ActivatedJob.leaseToken.
+  // For a leased job, the matching token must be supplied to prove the command comes from the
+  // worker that holds the current lease; a command with no token is rejected. A command carrying
+  // a stale token is likewise rejected, fencing the job against a superseded activation (e.g.
+  // after the job timed out or failed and was re-activated by another worker). A job that was
+  // activated without a lease requires no token.
+  optional string leaseToken = 4;
+}
+
+message JobResult{
+  // Indicates whether the worker denies the work, or explicitly doesn't approve it.
+  // For example, a user task listener can deny the completion of a user task by setting this flag to true.
+  // In this example, the completion of a task is represented by a job that the worker can complete as denied.
+  // As a result, the completion request is rejected and the task remains active.
+  // Defaults to false.
+  // Only applicable for user task listener jobs.
+  optional bool denied = 1;
+  // Attributes that were corrected by the worker.
+  // The following attributes can be corrected, additional attributes will be ignored:
+  //   * `assignee` - clear by providing an empty string
+  //   * `dueDate` - clear by providing an empty string
+  //   * `followUpDate` - clear by providing an empty string
+  //   * `candidateGroups` - clear by providing an empty list
+  //   * `candidateUsers` - clear by providing an empty list
+  //   * `priority` - minimum 0, maximum 100, default 50
+  // Omitting any of the attributes will preserve the persisted attribute's value.
+  // Only applicable for user task listener jobs.
+  optional JobResultCorrections corrections = 2;
+  // The reason provided by the user task listener for denying the work.
+  optional string deniedReason = 3;
+  // Identifies the type of job result. Must be either "userTask" or "adHocSubprocess".
+  // Defaults to "userTask" if not explicitly set.
+  optional string type = 4;
+  // The list of elements that should be activated after the job is completed.
+  // Only applicable for ad-hoc subprocesses.
+  repeated JobResultActivateElement activateElements = 5;
+}
+
+message JobResultCorrections {
+  // The assignee of the task.
+  optional string assignee = 1;
+  // The due date of the task.
+  optional string dueDate = 2;
+  // The follow-up date of the task.
+  optional string followUpDate = 3;
+  // The list of candidate users of the task.
+  optional StringList candidateUsers = 4;
+  // The list of candidate groups of the task.
+  optional StringList candidateGroups = 5;
+  // The priority of the task.
+  optional int32 priority = 6;
+}
+
+message JobResultActivateElement {
+  // The id of the element to activate
+  string elementId = 1;
+  // JSON document of variables that will be created on the scope of the activated element.
+  // It must be a JSON object, as variables will be mapped in a key-value fashion.
+  // e.g. { "a": 1, "b": 2 } will create two variables, named "a" and
+  // "b" respectively, with their associated values. [{ "a": 1, "b": 2 }] would not be a
+  // valid argument, as the root of the JSON document is an array and not an object.
+  string variables = 2;
+}
+
+message StringList {
+  // Wrapper around a list of string values.
+  repeated string values = 1;
 }
 ```
 
@@ -230,7 +363,10 @@ Only processes with none start events can be started through this command.
 :::
 
 :::note
-Start instructions have the same [limitations as process instance modification](/components/concepts/process-instance-modification.md#limitations), e.g., it is not possible to start at a sequence flow.
+Start and runtime instructions have the
+same [limitations as process instance modification](/components/concepts/process-instance-modification.md#limitations),
+e.g., it is not possible to start at a sequence flow or terminate a process instance when a sequence
+flow completes.
 :::
 
 ### Input: `CreateProcessInstanceRequest`
@@ -254,10 +390,27 @@ message CreateProcessInstanceRequest {
   // will start at the start event. If non-empty the process instance will apply start
   // instructions after it has been created
   repeated ProcessInstanceCreationStartInstruction startInstructions = 5;
-  // the tenant ID of the process definition
+
+  // the tenant id of the process definition
   string tenantId = 6;
-  // a reference key chosen by the user and will be part of all records resulting from this operation
+
+  // a reference key chosen by the user and will be part of all records resulted from this operation
   optional uint64 operationReference = 7;
+
+  // a list of runtime instruction that can modify the behavior of the process
+  // instance during its execution
+  // if empty (default), the process instance will be executed normally
+  repeated ProcessInstanceCreationRuntimeInstruction runtimeInstructions = 8;
+
+  // a list of tags that can be attached as meta-data to process instances
+  repeated string tags = 9;
+
+  // an optional, user-defined string identifier that identifies the process instance
+  // within the scope of the process definition (scoped by tenant). If provided and uniqueness
+  // enforcement is enabled, the engine will reject creation if another root process instance
+  // with the same business id is already active for the same process definition.
+  // Note that any active child process instances with the same business id are not taken into account.
+  optional string businessId = 10;
 }
 
 message ProcessInstanceCreationStartInstruction {
@@ -272,6 +425,18 @@ message ProcessInstanceCreationStartInstruction {
   // element ID
   string elementId = 1;
 }
+
+message ProcessInstanceCreationRuntimeInstruction {
+  oneof instruction {
+    TerminateProcessInstanceInstruction terminate = 1;
+  }
+}
+
+message TerminateProcessInstanceInstruction {
+  // the ID of the process element after which the process instance should be
+  // terminated
+  string afterElementId = 1;
+}
 ```
 
 ### Output: `CreateProcessInstanceResponse`
@@ -279,7 +444,7 @@ message ProcessInstanceCreationStartInstruction {
 ```protobuf
 message CreateProcessInstanceResponse {
   // the key of the process definition which was used to create the process instance
-  int64 processKey = 1;
+  int64 processDefinitionKey = 1;
   // the BPMN process ID of the process definition which was used to create the process
   // instance
   string bpmnProcessId = 2;
@@ -288,8 +453,12 @@ message CreateProcessInstanceResponse {
   // the unique identifier of the created process instance; to be used wherever a request
   // needs a process instance key (e.g. CancelProcessInstanceRequest)
   int64 processInstanceKey = 4;
-  // the tenant ID of the created process instance
+  // the tenant identifier of the created process instance
   string tenantId = 5;
+  // tags attached to a process instance
+  repeated string tags = 6;
+  // the business id of the created process instance
+  optional string businessId = 7;
 }
 ```
 
@@ -309,21 +478,24 @@ Start instructions have the same [limitations as process instance modification](
 ### Input: `CreateProcessInstanceWithResultRequest`
 
 ```protobuf
-message CreateProcessInstanceRequest {
-   CreateProcessInstanceRequest request = 1;
-   // timeout (in ms). the request will be closed if the process is not completed before
-   // the requestTimeout.
-   // if requestTimeout = 0, uses the generic requestTimeout configured in the gateway.
-   int64 requestTimeout = 2;
+message CreateProcessInstanceWithResultRequest {
+  CreateProcessInstanceRequest request = 1;
+  // timeout (in ms). the request will be closed if the process is not completed
+  // before the requestTimeout.
+  // if requestTimeout = 0, uses the generic requestTimeout configured in the gateway.
+  int64 requestTimeout = 2;
+  // list of names of variables to be included in `CreateProcessInstanceWithResultResponse.variables`
+  // if empty, all visible variables in the root scope will be returned.
+  repeated string fetchVariables = 3;
 }
 ```
 
 ### Output: `CreateProcessInstanceWithResultResponse`
 
 ```protobuf
-message CreateProcessInstanceResponse {
+message CreateProcessInstanceWithResultResponse {
   // the key of the process definition which was used to create the process instance
-  int64 processKey = 1;
+  int64 processDefinitionKey = 1;
   // the BPMN process ID of the process definition which was used to create the process
   // instance
   string bpmnProcessId = 2;
@@ -332,10 +504,15 @@ message CreateProcessInstanceResponse {
   // the unique identifier of the created process instance; to be used wherever a request
   // needs a process instance key (e.g. CancelProcessInstanceRequest)
   int64 processInstanceKey = 4;
-  // consisting of all visible variables to the root scope
+  // JSON document
+  // consists of visible variables in the root scope
   string variables = 5;
-  // the tenant ID of the process definition
+  // the tenant identifier of the process definition
   string tenantId = 6;
+  // tags attached to a process instance
+  repeated string tags = 7;
+  // the business id of the created process instance
+  optional string businessId = 8;
 }
 ```
 
@@ -362,6 +539,7 @@ Returned if:
 
 - The given variables argument is not a valid JSON document; it is expected to be a valid
   JSON document where the root node is an object.
+- The given `businessId` exceeds the maximum length of 256 characters.
 - If multi-tenancy is enabled, and `tenantId` is blank (empty string, null)
 - If multi-tenancy is enabled, and an invalid tenant ID is provided. A tenant ID is considered invalid if:
   - The tenant ID is blank (empty string, null)
@@ -372,6 +550,240 @@ Returned if:
 #### GRPC_STATUS_PERMISSION_DENIED
 
 - If multi-tenancy is enabled, and an unauthorized tenant ID is provided
+
+## `DeleteResource` RPC
+
+### Input `DeleteResourceRequest`
+
+```protobuf
+message DeleteResourceRequest {
+  // The key of the resource that should be deleted. This can either be the key
+  // of a process definition, the key of a decision requirements definition or the key of a form.
+  int64 resourceKey = 1;
+}
+```
+
+### Output: `DeleteResourceResponse`
+
+```protobuf
+message DeleteResourceResponse {
+}
+```
+
+### Errors
+
+#### GRPC_STATUS_NOT_FOUND
+
+Returned if:
+
+- No resource exists with the given key.
+- No resource was found with the given key for the tenants the user is authorized to work with.
+
+#### GRPC_STATUS_FAILED_PRECONDITION
+
+Returned if:
+
+- The deleted resource is a process definition, and there are running instances for this process definition.
+
+## `DeployResource` RPC
+
+Deploys one or more resources (e.g. processes, decision models or forms) to Zeebe.
+Note that this is an atomic call, i.e. either all resources are deployed, or none of them are.
+
+### Input: `DeployResourceRequest`
+
+```protobuf
+message DeployResourceRequest {
+  // list of resources to deploy
+  repeated Resource resources = 1;
+  // the tenant id of the resources to deploy
+  string tenantId = 2;
+}
+
+message Resource {
+  // the resource name, e.g. myProcess.bpmn or myDecision.dmn
+  string name = 1;
+  // the file content as a UTF8-encoded string
+  bytes content = 2;
+}
+```
+
+### Output: `DeployResourceResponse`
+
+```protobuf
+message DeployResourceResponse {
+  // the unique key identifying the deployment
+  int64 key = 1;
+  // a list of deployed resources, e.g. processes
+  repeated Deployment deployments = 2;
+  // the tenant id of the deployed resources
+  string tenantId = 3;
+}
+
+message Deployment {
+  // each deployment has only one metadata
+  oneof Metadata {
+    // metadata of a deployed process
+    ProcessMetadata process = 1;
+    // metadata of a deployed decision
+    DecisionMetadata decision = 2;
+    // metadata of a deployed decision requirements
+    DecisionRequirementsMetadata decisionRequirements = 3;
+    // metadata of a deployed form
+    FormMetadata form = 4;
+  }
+}
+
+message ProcessMetadata {
+  // the bpmn process ID, as parsed during deployment; together with the version forms a
+  // unique identifier for a specific process definition
+  string bpmnProcessId = 1;
+  // the assigned process version
+  int32 version = 2;
+  // the assigned key, which acts as a unique identifier for this process
+  int64 processDefinitionKey = 3;
+  // the resource name (see: ProcessRequestObject.name) from which this process was
+  // parsed
+  string resourceName = 4;
+  // the tenant id of the deployed process
+  string tenantId = 5;
+}
+
+message DecisionMetadata {
+  // the dmn decision ID, as parsed during deployment; together with the
+  // versions forms a unique identifier for a specific decision
+  string dmnDecisionId = 1;
+  // the dmn name of the decision, as parsed during deployment
+  string dmnDecisionName = 2;
+  // the assigned decision version
+  int32 version = 3;
+  // the assigned decision key, which acts as a unique identifier for this
+  // decision
+  int64 decisionKey = 4;
+  // the dmn ID of the decision requirements graph that this decision is part
+  // of, as parsed during deployment
+  string dmnDecisionRequirementsId = 5;
+  // the assigned key of the decision requirements graph that this decision is
+  // part of
+  int64 decisionRequirementsKey = 6;
+  // the tenant id of the deployed decision
+  string tenantId = 7;
+}
+
+message DecisionRequirementsMetadata {
+  // the dmn decision requirements ID, as parsed during deployment; together
+  // with the versions forms a unique identifier for a specific decision
+  string dmnDecisionRequirementsId = 1;
+  // the dmn name of the decision requirements, as parsed during deployment
+  string dmnDecisionRequirementsName = 2;
+  // the assigned decision requirements version
+  int32 version = 3;
+  // the assigned decision requirements key, which acts as a unique identifier
+  // for this decision requirements
+  int64 decisionRequirementsKey = 4;
+  // the resource name (see: Resource.name) from which this decision
+  // requirements was parsed
+  string resourceName = 5;
+  // the tenant id of the deployed decision requirements
+  string tenantId = 6;
+}
+
+message FormMetadata {
+  // the form ID, as parsed during deployment; together with the
+  // versions forms a unique identifier for a specific form
+  string formId = 1;
+  // the assigned form version
+  int32 version = 2;
+  // the assigned key, which acts as a unique identifier for this form
+  int64 formKey = 3;
+  // the resource name
+  string resourceName = 4;
+  // the tenant id of the deployed form
+  string tenantId = 5;
+}
+```
+
+### Errors
+
+#### GRPC_STATUS_INVALID_ARGUMENT
+
+Returned if:
+
+- No resources given.
+- At least one resource is invalid. A resource is considered invalid if:
+  - The resource type is not supported (e.g. supported resources include BPMN and DMN files)
+  - The content is not deserializable (e.g. detected as BPMN, but it's broken XML)
+  - The content is invalid (e.g. an event-based gateway has an outgoing sequence flow to a task)
+- If multi-tenancy is enabled, and `tenantId` is blank (empty string, null)
+- If multi-tenancy is enabled, and an invalid tenant ID is provided. A tenant ID is considered invalid if:
+  - The tenant ID is blank (empty string, null)
+  - The tenant ID is longer than 31 characters
+  - The tenant ID contains anything other than alphanumeric characters, dot (.), dash (-), or underscore (\_)
+- If multi-tenancy is disabled, and `tenantId` is not blank (empty string, null), or has an ID other than `<default>`
+
+#### GRPC_STATUS_PERMISSION_DENIED
+
+- If multi-tenancy is enabled, and an unauthorized tenant ID is provided
+
+## `EvaluateConditional` RPC
+
+Evaluates root-level conditional start events for process definitions.
+If the evaluation is successful, it will return the keys of all created process instances, along with their associated process definition key.
+Multiple root-level conditional start events of the same process definition can trigger if their conditions evaluate to true.
+
+### Input: `EvaluateConditionalRequest`
+
+```protobuf
+message EvaluateConditionalRequest {
+  // Used to evaluate root-level conditional start events for a tenant with the given ID.
+  // This will only evaluate root-level conditional start events of process definitions which belong to the tenant.
+  string tenantId = 1;
+  // Used to evaluate root-level conditional start events of the process definition with the given key.
+  optional int64 processDefinitionKey = 2;
+  // Serialized JSON object representing the variables to use for evaluation of the conditions and to pass to the process instances that have been triggered.
+  string variables = 3;
+}
+```
+
+### Output: `EvaluateConditionalResponse`
+
+```protobuf
+message EvaluateConditionalResponse {
+  // List of process instances created. If no root-level conditional start events evaluated to true, the list will be empty.
+  repeated ProcessInstanceReference processInstances = 1;
+  // The unique key of the conditional evaluation operation.
+  int64 conditionalEvaluationKey = 2;
+  // The tenant ID of the conditional evaluation operation.
+  string tenantId = 3;
+}
+
+message ProcessInstanceReference {
+  // The key of the process definition.
+  int64 processDefinitionKey = 1;
+  // The key of the created process instance.
+  int64 processInstanceKey = 2;
+}
+```
+
+### Errors
+
+#### GRPC_STATUS_INVALID_ARGUMENT
+
+Returned if:
+
+- The provided data is not valid
+
+#### GRPC_STATUS_NOT_FOUND
+
+Returned if:
+
+- The process definition was not found for the given processDefinitionKey
+
+#### GRPC_STATUS_PERMISSION_DENIED
+
+- The client is not authorized to start process instances for the specified process definition
+- If a processDefinitionKey is not provided, this indicates that the client is not authorized
+  to start process instances for at least one of the matched process definitions
 
 ## `EvaluateDecision` RPC
 
@@ -400,7 +812,7 @@ message EvaluateDecisionRequest {
   // [{ "a": 1, "b": 2 }] would not be a valid argument, as the root of the
   // JSON document is an array and not an object.
   string variables = 3;
-  // the tenant ID of the decision
+  // the tenant identifier of the decision
   string tenantId = 4;
 }
 ```
@@ -435,7 +847,7 @@ message EvaluateDecisionResponse {
   string failedDecisionId = 9;
   // an optional message describing why the decision which was evaluated failed
   string failureMessage = 10;
-  // the tenant ID of the evaluated decision
+  // the tenant identifier of the evaluated decision
   string tenantId = 11;
   // the unique key identifying this decision evaluation
   int64 decisionInstanceKey = 12;
@@ -461,7 +873,7 @@ message EvaluatedDecision {
   repeated MatchedDecisionRule matchedRules = 7;
   // the decision inputs that were evaluated within this decision evaluation
   repeated EvaluatedDecisionInput evaluatedInputs = 8;
-  // the tenant ID of the evaluated decision
+  // the tenant identifier of the evaluated decision
   string tenantId = 9;
 }
 
@@ -475,7 +887,7 @@ message EvaluatedDecisionInput {
 }
 
 message EvaluatedDecisionOutput {
-  // the id of the evaluated decision output
+  // the ID of the evaluated decision output
   string outputId = 1;
   // the name of the evaluated decision output
   string outputName = 2;
@@ -484,7 +896,7 @@ message EvaluatedDecisionOutput {
 }
 
 message MatchedDecisionRule {
-  // the id of the matched rule
+  // the ID of the matched rule
   string ruleId = 1;
   // the index of the matched rule
   int32 ruleIndex = 2;
@@ -502,146 +914,6 @@ Returned if:
 - No decision with the given key exists (if decisionKey was given).
 - No decision with the given decision ID exists (if decisionId was given).
 - Both decision ID and decision KEY were provided, or are missing.
-- If multi-tenancy is enabled, and `tenantId` is blank (empty string, null)
-- If multi-tenancy is enabled, and an invalid tenant ID is provided. A tenant ID is considered invalid if:
-  - The tenant ID is blank (empty string, null)
-  - The tenant ID is longer than 31 characters
-  - The tenant ID contains anything other than alphanumeric characters, dot (.), dash (-), or underscore (\_)
-- If multi-tenancy is disabled, and `tenantId` is not blank (empty string, null), or has an ID other than `<default>`
-
-#### GRPC_STATUS_PERMISSION_DENIED
-
-- If multi-tenancy is enabled, and an unauthorized tenant ID is provided
-
-## `DeployResource` RPC
-
-Deploys one or more resources (e.g. processes, decision models or forms) to Zeebe.
-Note that this is an atomic call, i.e. either all resources are deployed, or none of them are.
-
-### Input: `DeployResourceRequest`
-
-```protobuf
-message DeployResourceRequest {
-  // list of resources to deploy
-  repeated Resource resources = 1;
-  // the tenant ID of the resources to deploy
-  string tenantId = 2;
-}
-
-message Resource {
-  // the resource name, e.g. myProcess.bpmn, myDecision.dmn or myForm.form
-  string name = 1;
-  // the file content as a UTF8-encoded string
-  bytes content = 2;
-}
-```
-
-### Output: `DeployResourceResponse`
-
-```protobuf
-message DeployResourceResponse {
-  // the unique key identifying the deployment
-  int64 key = 1;
-  // a list of deployed resources, e.g. processes
-  repeated Deployment deployments = 2;
-  // the tenant ID of the deployed resources
-  string tenantId = 3;
-}
-
-message Deployment {
-  // each deployment has only one metadata
-  oneof Metadata {
-    // metadata of a deployed process
-    ProcessMetadata process = 1;
-    // metadata of a deployed decision
-    DecisionMetadata decision = 2;
-    // metadata of a deployed decision requirements
-    DecisionRequirementsMetadata decisionRequirements = 3;
-    // metadata of a deployed form
-    FormMetadata form = 4;
-  }
-}
-
-message ProcessMetadata {
-  // the bpmn process ID, as parsed during deployment; together with the version forms a
-  // unique identifier for a specific process definition
-  string bpmnProcessId = 1;
-  // the assigned process version
-  int32 version = 2;
-  // the assigned key, which acts as a unique identifier for this process
-  int64 processDefinitionKey = 3;
-  // the resource name (see: ProcessRequestObject.name) from which this process was
-  // parsed
-  string resourceName = 4;
-  // the tenant ID of the deployed process
-  string tenantId = 5;
-}
-
-message DecisionMetadata {
-  // the dmn decision ID, as parsed during deployment; together with the
-  // versions forms a unique identifier for a specific decision
-  string dmnDecisionId = 1;
-  // the dmn name of the decision, as parsed during deployment
-  string dmnDecisionName = 2;
-  // the assigned decision version
-  int32 version = 3;
-  // the assigned decision key, which acts as a unique identifier for this
-  // decision
-  int64 decisionKey = 4;
-  // the dmn ID of the decision requirements graph that this decision is part
-  // of, as parsed during deployment
-  string dmnDecisionRequirementsId = 5;
-  // the assigned key of the decision requirements graph that this decision is
-  // part of
-  int64 decisionRequirementsKey = 6;
-  // the tenant ID of the deployed decision
-  string tenantId = 7;
-}
-
-message DecisionRequirementsMetadata {
-  // the dmn decision requirements ID, as parsed during deployment; together
-  // with the versions forms a unique identifier for a specific decision
-  string dmnDecisionRequirementsId = 1;
-  // the dmn name of the decision requirements, as parsed during deployment
-  string dmnDecisionRequirementsName = 2;
-  // the assigned decision requirements version
-  int32 version = 3;
-  // the assigned decision requirements key, which acts as a unique identifier
-  // for this decision requirements
-  int64 decisionRequirementsKey = 4;
-  // the resource name (see: Resource.name) from which this decision
-  // requirements was parsed
-  string resourceName = 5;
-  // the tenant ID of the deployed decision requirements
-  string tenantId = 6;
-}
-
-message FormMetadata {
-  // the form ID, as parsed during deployment; together with the
-  // versions forms a unique identifier for a specific form
-  string formId = 1;
-  // the assigned form version
-  int32 version = 2;
-  // the assigned key, which acts as a unique identifier for this form
-  int64 formKey = 3;
-  // the resource name
-  string resourceName = 4;
-  // the tenant ID of the deployed form
-  string tenantId = 5;
-}
-```
-
-### Errors
-
-#### GRPC_STATUS_INVALID_ARGUMENT
-
-Returned if:
-
-- No resources given.
-- At least one resource is invalid. A resource is considered invalid if:
-  - The resource type is not supported (e.g. supported resources include BPMN and DMN files)
-  - The content is not deserializable (e.g. detected as BPMN, but it's broken XML)
-  - The content is invalid (e.g. an event-based gateway has an outgoing sequence flow to a task)
 - If multi-tenancy is enabled, and `tenantId` is blank (empty string, null)
 - If multi-tenancy is enabled, and an invalid tenant ID is provided. A tenant ID is considered invalid if:
   - The tenant ID is blank (empty string, null)
@@ -680,6 +952,13 @@ message FailJobRequest {
   // "b" respectively, with their associated values. [{ "a": 1, "b": 2 }] would not be a
   // valid argument, as the root of the JSON document is an array and not an object.
   string variables = 5;
+  // the token identifying a leased job's activation, obtained from ActivatedJob.leaseToken.
+  // For a leased job, the matching token must be supplied to prove the command comes from the
+  // worker that holds the current lease; a command with no token is rejected. A command carrying
+  // a stale token is likewise rejected, fencing the job against a superseded activation (e.g.
+  // after the job timed out or failed and was re-activated by another worker). A job that was
+  // activated without a lease requires no token.
+  optional string leaseToken = 6;
 }
 ```
 
@@ -706,91 +985,6 @@ Returned if:
 - The job was not activated.
 - The job is already in a failed state, i.e. ran out of retries.
 
-## `ModifyProcessInstance` RPC
-
-Modifies a running process instance. The command can contain multiple instructions to activate an element of the
-process, or to terminate an active instance of an element.
-
-Use the command to repair a process instance that is stuck on an element or took an unintended path. For example,
-because an external system is not available or doesn't respond as expected.
-
-### Input: `ModifyProcessInstanceRequest`
-
-```protobuf
-message ModifyProcessInstanceRequest {
-  // the key of the process instance that should be modified
-  int64 processInstanceKey = 1;
-  // instructions describing which elements should be activated in which scopes,
-  // and which variables should be created
-  repeated ActivateInstruction activateInstructions = 2;
-  // instructions describing which elements should be terminated
-  repeated TerminateInstruction terminateInstructions = 3;
-  // a reference key chosen by the user and will be part of all records resulting from this operation
-  optional uint64 operationReference = 4;
-
-  message ActivateInstruction {
-    // the id of the element that should be activated
-    string elementId = 1;
-    // the key of the ancestor scope the element instance should be created in;
-    // set to -1 to create the new element instance within an existing element
-    // instance of the flow scope
-    int64 ancestorElementInstanceKey = 2;
-    // instructions describing which variables should be created
-    repeated VariableInstruction variableInstructions = 3;
-  }
-
-  message VariableInstruction {
-    // JSON document that will instantiate the variables for the root variable scope of the
-    // process instance; it must be a JSON object, as variables will be mapped in a
-    // key-value fashion. e.g. { "a": 1, "b": 2 } will create two variables, named "a" and
-    // "b" respectively, with their associated values. [{ "a": 1, "b": 2 }] would not be a
-    // valid argument, as the root of the JSON document is an array and not an object.
-    string variables = 1;
-    // the id of the element in which scope the variables should be created;
-    // leave empty to create the variables in the global scope of the process instance
-    string scopeId = 2;
-  }
-
-  message TerminateInstruction {
-    // the id of the element that should be terminated
-    int64 elementInstanceKey = 1;
-  }
-}
-```
-
-### Output: `ModifyProcessInstanceResponse`
-
-```protobuf
-message ModifyProcessInstanceResponse {
-}
-```
-
-### Errors
-
-#### GRPC_STATUS_NOT_FOUND
-
-Returned if:
-
-- No process instance exists with the given key, or it is not active.
-- No process instance was found with the given key for the tenants the user is authorized to work with.
-
-#### GRPC_STATUS_INVALID_ARGUMENT
-
-Returned if:
-
-- At least one activate instruction is invalid. An activate instruction is considered invalid if:
-  - The process doesn't contain an element with the given id.
-  - A flow scope of the given element can't be created.
-  - The given element has more than one active instance of its flow scope.
-- At least one variable instruction is invalid. A variable instruction is considered invalid if:
-  - The process doesn't contain an element with the given scope id.
-  - The given element doesn't belong to the activating element's flow scope.
-  - The given variables are not a valid JSON document.
-- At least one terminate instruction is invalid. A terminate instruction is considered invalid if:
-  - No element instance exists with the given key, or it is not active.
-- The instructions would terminate all element instances of a process instance that was created by a call activity in
-  the parent process.
-
 ## `MigrateProcessInstance` RPC
 
 Migrates a process instance to a new process definition. The command can contain multiple mapping instructions
@@ -807,8 +1001,7 @@ message MigrateProcessInstanceRequest {
   int64 processInstanceKey = 1;
   // the migration plan that defines target process and element mappings
   MigrationPlan migrationPlan = 2;
-  // a reference key chosen by the user and will be part of all records resulting from this operation
-  optional uint64 operationReference = 3;
+
   message MigrationPlan {
     // the key of process definition to migrate the process instance to
     int64 targetProcessDefinitionKey = 1;
@@ -817,9 +1010,9 @@ message MigrateProcessInstanceRequest {
   }
 
   message MappingInstruction {
-    // the element id to migrate from
+    // the element ID to migrate from
     string sourceElementId = 1;
-    // the element id to migrate into
+    // the element ID to migrate into
     string targetElementId = 2;
   }
 }
@@ -861,6 +1054,92 @@ Returned if:
 - A mapping instruction refers to an unsupported element (i.e. some elements will be supported later on)
 - A mapping instruction refers to element in unsupported scenarios.
   (i.e. migrating active elements with event subscriptions will be supported later on)
+- A mapping instruction detaches a boundary event from an active element
+- Multiple mapping instructions refer to the same catch event
+- A mapping instruction changes a parallel multi-instance body to a sequential multi-instance body or vice versa
+
+## `ModifyProcessInstance` RPC
+
+Modifies a running process instance. The command can contain multiple instructions to activate an element of the
+process, or to terminate an active instance of an element.
+
+Use the command to repair a process instance that is stuck on an element or took an unintended path. For example,
+because an external system is not available or doesn't respond as expected.
+
+### Input: `ModifyProcessInstanceRequest`
+
+```protobuf
+message ModifyProcessInstanceRequest {
+  // the key of the process instance that should be modified
+  int64 processInstanceKey = 1;
+  // instructions describing which elements should be activated in which scopes,
+  // and which variables should be created
+  repeated ActivateInstruction activateInstructions = 2;
+  // instructions describing which elements should be terminated
+  repeated TerminateInstruction terminateInstructions = 3;
+
+  message ActivateInstruction {
+    // the ID of the element that should be activated
+    string elementId = 1;
+    // the key of the ancestor scope the element instance should be created in;
+    // set to -1 to create the new element instance within an existing element
+    // instance of the flow scope
+    int64 ancestorElementInstanceKey = 2;
+    // instructions describing which variables should be created
+    repeated VariableInstruction variableInstructions = 3;
+  }
+
+  message VariableInstruction {
+    // JSON document that will instantiate the variables for the root variable scope of the
+    // process instance; it must be a JSON object, as variables will be mapped in a
+    // key-value fashion. e.g. { "a": 1, "b": 2 } will create two variables, named "a" and
+    // "b" respectively, with their associated values. [{ "a": 1, "b": 2 }] would not be a
+    // valid argument, as the root of the JSON document is an array and not an object.
+    string variables = 1;
+    // the ID of the element in which scope the variables should be created;
+    // leave empty to create the variables in the global scope of the process instance
+    string scopeId = 2;
+  }
+
+  message TerminateInstruction {
+    // the ID of the element that should be terminated
+    int64 elementInstanceKey = 1;
+  }
+}
+```
+
+### Output: `ModifyProcessInstanceResponse`
+
+```protobuf
+message ModifyProcessInstanceResponse {
+}
+```
+
+### Errors
+
+#### GRPC_STATUS_NOT_FOUND
+
+Returned if:
+
+- No process instance exists with the given key, or it is not active.
+- No process instance was found with the given key for the tenants the user is authorized to work with.
+
+#### GRPC_STATUS_INVALID_ARGUMENT
+
+Returned if:
+
+- At least one activate instruction is invalid. An activate instruction is considered invalid if:
+  - The process doesn't contain an element with the given ID.
+  - A flow scope of the given element can't be created.
+  - The given element has more than one active instance of its flow scope.
+- At least one variable instruction is invalid. A variable instruction is considered invalid if:
+  - The process doesn't contain an element with the given scope ID.
+  - The given element doesn't belong to the activating element's flow scope.
+  - The given variables are not a valid JSON document.
+- At least one terminate instruction is invalid. A terminate instruction is considered invalid if:
+  - No element instance exists with the given key, or it is not active.
+- The instructions would terminate all element instances of a process instance that was created by a call activity in
+  the parent process.
 
 ## `PublishMessage` RPC
 
@@ -883,7 +1162,7 @@ message PublishMessageRequest {
   // the message variables as a JSON document; to be valid, the root of the document must be an
   // object, e.g. { "a": "foo" }. [ "foo" ] would not be valid.
   string variables = 5;
-  // the tenant ID of the message
+  // the tenant id of the message
   string tenantId = 6;
 }
 ```
@@ -894,7 +1173,7 @@ message PublishMessageRequest {
 message PublishMessageResponse {
   // the unique ID of the message that was published
   int64 key = 1;
-  // the tenant ID of the message
+  // the tenant id of the message
   string tenantId = 2;
 }
 ```
@@ -932,8 +1211,6 @@ problem, followed by this call.
 message ResolveIncidentRequest {
   // the unique ID of the incident to resolve
   int64 incidentKey = 1;
-  // a reference key chosen by the user and will be part of all records resulting from this operation
-  optional uint64 operationReference = 2;
 }
 ```
 
@@ -976,8 +1253,6 @@ message SetVariablesRequest {
   // be unchanged, and scope 2 will now be `{ "bar" : 1, "foo" 5 }`. if local was false, however,
   // then scope 1 would be `{ "foo": 5 }`, and scope 2 would be `{ "bar" : 1 }`.
   bool local = 3;
-  // a reference key chosen by the user and will be part of all records resulting from this operation
-  optional uint64 operationReference = 4;
 }
 ```
 
@@ -1006,6 +1281,119 @@ Returned if:
 - The given payload is not a valid JSON document; all payloads are expected to be
   valid JSON documents where the root node is an object.
 
+## `StreamActivatedJobs` RPC
+
+Opens a long living stream for the given job type, worker name, job timeout, and fetch variables. This will cause available
+jobs in the engine to be activated and pushed down this stream.
+
+See the [job worker's technical reference](/components/concepts/job-workers.md) for more on this.
+
+### Input `StreamActivatedJobsRequest`
+
+```protobuf
+message StreamActivatedJobsRequest {
+  // the job type, as defined in the BPMN process (e.g. <zeebe:taskDefinition
+  // type="payment-service" />)
+  string type = 1;
+  // the name of the worker activating the jobs, mostly used for logging purposes
+  string worker = 2;
+  // a job returned after this call will not be activated by another call until the
+  // timeout (in ms) has been reached
+  int64 timeout = 3;
+  // a list of variables to fetch as the job variables; if empty, all visible variables at
+  // the time of activation for the scope of the job will be returned
+  repeated string fetchVariable = 5;
+  // a list of identifiers of tenants for which to stream jobs
+  repeated string tenantIds = 6;
+  // whether to stream jobs with a lease; when true, each job pushed on this stream is
+  // assigned a distinct, opaque lease token, returned as ActivatedJob.leaseToken. The lease
+  // fences the complete, fail, and throw-error commands against a superseded activation of
+  // the same job (e.g. after the job timed out or failed and was re-activated by another
+  // worker): a command carrying a stale lease token is rejected rather than racing with the
+  // newer activation. Defaults to false, which pushes jobs without a lease.
+  bool withLease = 8;
+}
+```
+
+### Output: a stream of `ActivatedJob`
+
+```protobuf
+message ActivatedJob {
+  // Describes the kind of job.
+  enum JobKind {
+    BPMN_ELEMENT = 0;
+    EXECUTION_LISTENER = 1;
+    TASK_LISTENER = 2;
+  }
+
+  // Describes the listener event type of the job.
+  enum ListenerEventType {
+    ASSIGNING = 0;
+    CANCELING = 1;
+    COMPLETING = 2;
+    CREATING = 3;
+    END = 4;
+    START = 5;
+    UNSPECIFIED = 6;
+    UPDATING = 7;
+  }
+
+  // the key, a unique identifier for the job
+  int64 key = 1;
+  // the type of the job (should match what was requested)
+  string type = 2;
+  // the job's process instance key
+  int64 processInstanceKey = 3;
+  // the bpmn process ID of the job process definition
+  string bpmnProcessId = 4;
+  // the version of the job process definition
+  int32 processDefinitionVersion = 5;
+  // the key of the job process definition
+  int64 processDefinitionKey = 6;
+  // the associated task element ID
+  string elementId = 7;
+  // the unique key identifying the associated task, unique within the scope of the
+  // process instance
+  int64 elementInstanceKey = 8;
+  // a set of custom headers defined during modelling; returned as a serialized
+  // JSON document
+  string customHeaders = 9;
+  // the name of the worker which activated this job
+  string worker = 10;
+  // the amount of retries left to this job (should always be positive)
+  int32 retries = 11;
+  // when the job can be activated again, sent as a UNIX epoch timestamp
+  int64 deadline = 12;
+  // JSON document, computed at activation time, consisting of all visible variables to
+  // the task scope
+  string variables = 13;
+  // the ID of the tenant that owns the job
+  string tenantId = 14;
+  // the kind of the job.
+  JobKind kind = 15;
+  // the listener event type of the job.
+  ListenerEventType listenerEventType = 16;
+  // the lease token identifying this activation; unset when the job was activated without a
+  // lease
+  optional string leaseToken = 21;
+}
+```
+
+### Errors
+
+#### GRPC_STATUS_INVALID_ARGUMENT
+
+Returned if:
+
+- Type is blank (empty string, null)
+- Timeout less than 1 (ms)
+- If multi-tenancy is enabled, and `tenantIds` is empty (empty list)
+- If multi-tenancy is enabled, and an invalid tenant ID is provided. A tenant ID is considered invalid if:
+  - The tenant ID is blank (empty string, null)
+  - The tenant ID is longer than 31 characters
+  - The tenant ID contains anything other than alphanumeric characters, dot (.), dash (-), or underscore (\_)
+- If multi-tenancy is disabled, and `tenantIds` is not empty (empty list), or has an ID other than `<default>`
+
 ## `ThrowError` RPC
 
 `ThrowError` reports a business error (i.e. non-technical) that occurs while processing a job.
@@ -1030,6 +1418,13 @@ message ThrowErrorRequest {
   // "b" respectively, with their associated values. [{ "a": 1, "b": 2 }] would not be a
   // valid argument, as the root of the JSON document is an array and not an object.
   string variables = 4;
+  // the token identifying a leased job's activation, obtained from ActivatedJob.leaseToken.
+  // For a leased job, the matching token must be supplied to prove the command comes from the
+  // worker that holds the current lease; a command with no token is rejected. A command carrying
+  // a stale token is likewise rejected, fencing the job against a superseded activation (e.g.
+  // after the job timed out or failed and was re-activated by another worker). A job that was
+  // activated without a lease requires no token.
+  optional string leaseToken = 5;
 }
 ```
 
@@ -1059,6 +1454,14 @@ Returned if:
 
 Obtains the current topology of the cluster the gateway is part of.
 
+:::note
+The partition role can be one of `LEADER`, `FOLLOWER`, or `INACTIVE`, which [is defined here](../../components/zeebe/technical-concepts/partitions.md#roles).
+:::
+
+:::note
+The partition health can be one of `HEALTHY`, `UNHEALTHY`, or `DEAD`, which [is defined here](../../components/zeebe/technical-concepts/health.md).
+:::
+
 ### Input: `TopologyRequest`
 
 ```protobuf
@@ -1080,6 +1483,8 @@ message TopologyResponse {
   int32 replicationFactor = 4;
   // gateway version
   string gatewayVersion = 5;
+  // the cluster's unique ID
+  string clusterId = 6;
 }
 
 message BrokerInfo {
@@ -1100,12 +1505,14 @@ message Partition {
   enum PartitionBrokerRole {
     LEADER = 0;
     FOLLOWER = 1;
+    INACTIVE = 2;
   }
 
   // Describes the current health of the partition
   enum PartitionBrokerHealth {
     HEALTHY = 0;
     UNHEALTHY = 1;
+    DEAD = 2;
   }
 
   // the unique ID of this partition
@@ -1134,8 +1541,15 @@ message UpdateJobRetriesRequest {
   int64 jobKey = 1;
   // the new amount of retries for the job; must be positive
   int32 retries = 2;
-  // a reference key chosen by the user and will be part of all records resulting from this operation
-  optional uint64 operationReference = 3;
+  // the token identifying a leased job's activation, obtained from ActivatedJob.leaseToken.
+  // For a leased job, a supplied token is validated to prove the command comes from the worker
+  // that holds the current lease; a command carrying a stale token is rejected, fencing the job
+  // against a superseded activation (e.g. after the job timed out or failed and was re-activated
+  // by another worker). An update without a token always applies, to support operator and bulk
+  // updates of leased jobs; this differs from lifecycle commands like complete, fail, and
+  // throw-error, which always require a token for leased jobs. A job that was activated without a
+  // lease requires no token.
+  optional string leaseToken = 4;
 }
 ```
 
@@ -1174,8 +1588,15 @@ message UpdateJobTimeoutRequest {
   int64 jobKey = 1;
   // the duration of the new timeout in ms, starting from the current moment
   int64 timeout = 2;
-  // a reference key chosen by the user and will be part of all records resulting from this operation
-  optional uint64 operationReference = 3;
+  // the token identifying a leased job's activation, obtained from ActivatedJob.leaseToken.
+  // For a leased job, a supplied token is validated to prove the command comes from the worker
+  // that holds the current lease; a command carrying a stale token is rejected, fencing the job
+  // against a superseded activation (e.g. after the job timed out or failed and was re-activated
+  // by another worker). An update without a token always applies, to support operator and bulk
+  // updates of leased jobs; this differs from lifecycle commands like complete, fail, and
+  // throw-error, which always require a token for leased jobs. A job that was activated without a
+  // lease requires no token.
+  optional string leaseToken = 4;
 }
 ```
 
@@ -1201,24 +1622,36 @@ Returned if:
 
 - The job is not active.
 
-## `DeleteResource` RPC
+## `UpdateJobPriority` RPC
 
-### Input `DeleteResourceRequest`
+Updates the priority of a job.
+
+### Input: `UpdateJobPriorityRequest`
 
 ```protobuf
-message DeleteResourceRequest {
-  // The key of the resource that should be deleted. This can be the key
-  // of a process definition, the key of a decision requirements definition or the key of a form definition.
-  int64 resourceKey = 1;
-  // a reference key chosen by the user and will be part of all records resulting from this operation
-  optional uint64 operationReference = 2;
+message UpdateJobPriorityRequest {
+  // the unique job identifier, as obtained from ActivateJobsResponse
+  int64 jobKey = 1;
+  // the new priority value for the job
+  optional int32 priority = 2;
+  // a reference key chosen by the user and will be part of all records resulted from this operation
+  optional uint64 operationReference = 3;
+  // the token identifying a leased job's activation, obtained from ActivatedJob.leaseToken.
+  // For a leased job, a supplied token is validated to prove the command comes from the worker
+  // that holds the current lease; a command carrying a stale token is rejected, fencing the job
+  // against a superseded activation (e.g. after the job timed out or failed and was re-activated
+  // by another worker). An update without a token always applies, to support operator and bulk
+  // updates of leased jobs; this differs from lifecycle commands like complete, fail, and
+  // throw-error, which always require a token for leased jobs. A job that was activated without a
+  // lease requires no token.
+  optional string leaseToken = 4;
 }
 ```
 
-### Output: `DeleteResourceResponse`
+### Output: `UpdateJobPriorityResponse`
 
 ```protobuf
-message DeleteResourceResponse {
+message UpdateJobPriorityResponse {
 }
 ```
 
@@ -1228,91 +1661,17 @@ message DeleteResourceResponse {
 
 Returned if:
 
-- No resource exists with the given key.
-- No resource was found with the given key for the tenants the user is authorized to work with.
-
-#### GRPC_STATUS_FAILED_PRECONDITION
-
-Returned if:
-
-- The deleted resource is a process definition, and there are running instances for this process definition.
-
-## `StreamActivatedJobs` RPC
-
-Opens a long living stream for the given job type, worker name, job timeout, and fetch variables. This will cause available
-jobs in the engine to be activated and pushed down this stream.
-
-See the [job worker's technical reference](/components/concepts/job-workers.md) for more on this.
-
-### Input `StreamActivatedJobsRequest`
-
-```protobuf
-message StreamActivatedJobsRequest {
-  // the job type, as defined in the BPMN process (e.g. <zeebe:taskDefinition
-  // type="payment-service" />)
-  string type = 1;
-  // the name of the worker activating the jobs, mostly used for logging purposes
-  string worker = 2;
-  // a job returned after this call will not be activated by another call until the
-  // timeout (in ms) has been reached
-  int64 timeout = 3;
-  // a list of variables to fetch as the job variables; if empty, all visible variables at
-  // the time of activation for the scope of the job will be returned
-  repeated string fetchVariable = 5;
-  // a list of identifiers of tenants for which to stream jobs
-  repeated string tenantIds = 6;
-}
-```
-
-### Output: a stream of `ActivatedJob`
-
-```protobuf
-message ActivatedJob {
-  // the key, a unique identifier for the job
-  int64 key = 1;
-  // the type of the job (should match what was requested)
-  string type = 2;
-  // the job's process instance key
-  int64 processInstanceKey = 3;
-  // the bpmn process ID of the job process definition
-  string bpmnProcessId = 4;
-  // the version of the job process definition
-  int32 processDefinitionVersion = 5;
-  // the key of the job process definition
-  int64 processDefinitionKey = 6;
-  // the associated task element ID
-  string elementId = 7;
-  // the unique key identifying the associated task, unique within the scope of the
-  // process instance
-  int64 elementInstanceKey = 8;
-  // a set of custom headers defined during modelling; returned as a serialized
-  // JSON document
-  string customHeaders = 9;
-  // the name of the worker which activated this job
-  string worker = 10;
-  // the amount of retries left to this job (should always be positive)
-  int32 retries = 11;
-  // when the job can be activated again, sent as a UNIX epoch timestamp
-  int64 deadline = 12;
-  // JSON document, computed at activation time, consisting of all visible variables to
-  // the task scope
-  string variables = 13;
-  // the id of the tenant that owns the job
-  string tenantId = 14;
-}
-```
-
-### Errors
+- No job exists with the given key.
+- No job was found with the given key for the tenants the user is authorized to work with.
 
 #### GRPC_STATUS_INVALID_ARGUMENT
 
 Returned if:
 
-- Type is blank (empty string, null)
-- Timeout less than 1 (ms)
-- If multi-tenancy is enabled, and `tenantIds` is empty (empty list)
-- If multi-tenancy is enabled, and an invalid tenant ID is provided. A tenant ID is considered invalid if:
-  - The tenant ID is blank (empty string, null)
-  - The tenant ID is longer than 31 characters
-  - The tenant ID contains anything other than alphanumeric characters, dot (.), dash (-), or underscore (\_)
-- If multi-tenancy is disabled, and `tenantIds` is not empty (empty list), or has an ID other than `<default>`
+- Priority is not provided.
+
+#### GRPC_STATUS_INVALID_STATE
+
+Returned if:
+
+- The job is in a terminal state.

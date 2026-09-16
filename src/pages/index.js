@@ -5,6 +5,8 @@ import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import styles from "./styles.module.css";
+import AlgoliaSearchBox from "@theme/SearchBar";
+import iconBuildWithAi from "../../docs/components/assets/icon-agentic.png";
 
 const features = [
   {
@@ -15,11 +17,18 @@ const features = [
       "New to Camunda 8? Create an account and start modeling your first process.",
   },
   {
-    title: "Components",
+    title: "Build with AI",
+    imageUrl: iconBuildWithAi,
+    url: "/docs/guides/build-with-ai/overview/",
+    description:
+      "Build Camunda solutions with AI-ready workflows and agentic orchestration.",
+  },
+  {
+    title: "Using Camunda",
     imageUrl: "img/home-components.png",
     url: "/docs/components/",
     description:
-      "Explore components such as Console, Modeler, Zeebe, Operate, and Optimize.",
+      "Learn how to use Camunda 8 components, features, and integrations.",
   },
   {
     title: "Self-Managed",
@@ -29,21 +38,14 @@ const features = [
       "Set up and host Camunda 8 yourself instead of using Camunda 8 SaaS.",
   },
   {
-    title: "APIs and tools",
+    title: "APIs & tools",
     imageUrl: "img/home-apis.png",
     url: "/docs/apis-tools/working-with-apis-tools/",
     description:
       "Explore Zeebe client libraries, Camunda component APIs, and SDKs.",
   },
   {
-    title: "Best practice",
-    imageUrl: "img/home-bp.png",
-    url: "/docs/components/best-practices/best-practices-overview/",
-    description:
-      "Level up your BPMN and DMN skills, including insights from consulting and the community.",
-  },
-  {
-    title: "General reference",
+    title: "Reference",
     imageUrl: "img/home-reference.png",
     url: "/docs/reference/",
     description:
@@ -80,9 +82,26 @@ function Feature({ imageUrl, url, title, description }) {
   );
 }
 
+const search_agentic_url =
+  "/docs/components/agentic-orchestration/agentic-orchestration-overview/";
+const search_agent_url = "/docs/guides/getting-started-agentic-orchestration/";
+const search_idp_url = "/docs/components/modeler/web-modeler/idp/";
+const release = "/docs/reference/announcements-release-notes/overview/";
+const search_migrate_url = "/docs/guides/migrating-from-camunda-7/";
+const search_feel_url = "/docs/components/modeler/feel/what-is-feel/";
+
 function Home() {
   const context = useDocusaurusContext();
   const { siteConfig = {} } = context;
+
+  const openKapa = () => {
+    if (typeof window !== "undefined" && window.Kapa?.open) {
+      window.Kapa.open({});
+    } else {
+      console.warn("Kapa widget is not loaded yet.");
+    }
+  };
+
   return (
     <Layout
       title={`${siteConfig.title}`}
@@ -92,6 +111,20 @@ function Home() {
         <div className="container">
           <h1 className="hero__title">{siteConfig.title}</h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
+          <div className="homeSearch">
+            <AlgoliaSearchBox />
+          </div>
+          <p className="popular" style={{ color: "#ccc" }}>
+            <strong style={{ paddingRight: "20px" }}>Popular:</strong>{" "}
+            <Link to={useBaseUrl(search_agentic_url)}>
+              Agentic orchestration
+            </Link>
+            <Link to={useBaseUrl(search_agent_url)}>Build an AI agent</Link>
+            <Link to={useBaseUrl(search_idp_url)}>IDP</Link>
+            <Link to={useBaseUrl(release)}>Release notes</Link>
+            <Link to={useBaseUrl(search_migrate_url)}>Camunda 7 migration</Link>
+            <Link to={useBaseUrl(search_feel_url)}>What is FEEL</Link>
+          </p>
           <div className={clsx("row", styles.buttonsWrapper)}>
             <div className={clsx("", styles.buttons)}>
               <Link
@@ -111,12 +144,10 @@ function Home() {
                   "button button--outline button--secondary button--lg sign-up",
                   styles.getStarted
                 )}
-                to={useBaseUrl(
-                  "https://signup.camunda.com/accounts?utm_source=docs.camunda.io&utm_medium=referral"
-                )}
-                title="Sign up for Camunda 8 SaaS"
+                to={useBaseUrl("build-with-camunda")}
+                title="Try Camunda 8 for free"
               >
-                Sign up
+                Try free
               </Link>
             </div>
           </div>
@@ -124,7 +155,7 @@ function Home() {
       </header>
       <main>
         {features && features.length > 0 && (
-          <section className={styles.features}>
+          <section className={(styles.features, styles.featuresBlock)}>
             <div className="container">
               <div className={styles.featuresGrid}>
                 {features.map((props, idx) => (
@@ -146,29 +177,40 @@ function Home() {
                   "button button--outline button--secondary button--lg button--hero get-started-use-case",
                   styles.getStarted
                 )}
+                to={useBaseUrl(search_agentic_url)}
+              >
+                Agentic Orchestration
+              </Link>
+              <Link
+                className={clsx(
+                  "button button--outline button--secondary button--lg button--hero get-started-use-case get-started-use-case-2",
+                  styles.getStarted
+                )}
                 to={useBaseUrl(
-                  "docs/apis-tools/spring-zeebe-sdk/getting-started/"
+                  "docs/reference/announcements-release-notes/890/whats-new-in-89/"
                 )}
               >
-                Spring Zeebe SDK
+                What's new in 8.9
               </Link>
               <Link
                 className={clsx(
                   "button button--outline button--secondary button--lg button--hero get-started-use-case get-started-use-case-2",
                   styles.getStarted
                 )}
-                to={useBaseUrl("docs/reference/release-notes/")}
+                to={useBaseUrl(
+                  "docs/reference/announcements-release-notes/890/890-release-notes/"
+                )}
               >
-                Release notes
+                8.9 release notes
               </Link>
               <Link
                 className={clsx(
                   "button button--outline button--secondary button--lg button--hero get-started-use-case get-started-use-case-2",
                   styles.getStarted
                 )}
-                to={useBaseUrl("docs/apis-tools/node-js-sdk/")}
+                to={useBaseUrl("docs/apis-tools/java-client/getting-started/")}
               >
-                Node.js SDK
+                Java client
               </Link>
             </div>
           </div>

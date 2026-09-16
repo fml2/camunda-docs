@@ -1,22 +1,22 @@
 ---
 id: desktop-modeler-dmn
 title: DMN in Modeler
-description: "Camunda Desktop and Web Modeler both offer the same Modeling experience for DMN 1.3 models: Modeling starts in the Decision Requirements Diagram (DRD) view."
+description: "Camunda Desktop and Camunda Hub both offer the same Modeling experience for DMN 1.3 models, with modeling starting in the Decision Requirements Diagram (DRD) view."
 ---
+
+Decision Model and Notation (DMN) is a modeling approach owned by an institution called the Object Management Group ([OMG](https://www.omg.org/)), which also operates worldwide standards for [BPMN](/components/modeler/bpmn/automating-a-process-using-bpmn.md).
+
+In [DMN](/components/modeler/dmn/dmn.md), decisions are modeled and executed using a language both business analysts and developers can understand. Model a set of rules within a table, and this will yield a decision to rapidly execute a process using a decision engine like Camunda.
 
 ## Start modeling
 
 ![Start Modeling](assets/desktop-modeler-dmn/main.png)
 
-Camunda Desktop and Web Modeler both offer the same Modeling experience for DMN 1.3 models: Modeling starts in the Decision Requirements Diagram (DRD) view. From there, you can add DMN elements from the palette on the left side by dragging and dropping them onto the diagram canvas.
+Camunda Desktop and Camunda Hub both offer the same Modeling experience for DMN 1.3 models: Modeling starts in the Decision Requirements Diagram (DRD) view. From there, you can add DMN elements from the palette on the left side by dragging and dropping them onto the diagram canvas.
 
-Alternatively, you can add new elements by using the context menu that appears when you select an element in the diagram. Using the wrench icon in the context menu, you can change the type of an element in place. Use the properties panel on the right side to change the name or id of the DMN diagram.
+Alternatively, you can add new elements by using the context menu that appears when you select an element in the diagram. To change the type of an element, click on the element and select the **Change element** menu icon. Use the properties panel on the right side to change the name or ID of the DMN diagram.
 
-## Demo
-
-![Demo](assets/desktop-modeler-dmn/demo.gif)
-
-The demo above shows how to model a decision table. After creating a decision and morphing it into a decision table, you can start editing the table by clicking the overlay on the upper left corner of the decision. Using the overview in the decision table view, you can jump between decision tables.
+After creating a decision and morphing it into a decision table, you can start editing the table by clicking the overlay on the upper left corner of the decision. Using the overview in the decision table view, you can jump between decision tables.
 
 ## DMN coverage
 
@@ -52,6 +52,10 @@ Jump between decision tables or literal expressions in your decision requirement
 You can also edit literal expressions. Just as with decision tables, in the decision requirement diagram view, click the blue icon to _drill-down_ into the literal expression view and start editing.
 
 ## Business knowledge models
+
+:::caution
+Viewing the result of BKM evaluation is currently not supported in Operate.
+:::
 
 A _business knowledge model_ (BKM) is a reusable function containing a piece of decision logic. Typically, a BKM instantiates business logic that is required in multiple decisions, such as a common computation. For example, an amortization formula might be used in different loan application processes.
 

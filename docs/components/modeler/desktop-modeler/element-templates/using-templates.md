@@ -6,14 +6,14 @@ description: "Learn how to apply, remove, update, and replace templates."
 
 ## Applying templates
 
-If a template matches a selected diagram element, the template catalog button is shown in the properties panel.
+If an [element template](/components/modeler/element-templates/about-templates.md) matches a selected diagram element, the template catalog button is shown in the properties panel on the right side of the screen.
 
 ![Template Chooser](./img/chooser.png)
 
-Clicking **Select** opens a modal menu, allowing the user to browse and search available templates for the
+Clicking **Select** opens a popup menu, allowing you to browse and search available templates for the
 selected element.
 
-![Modal Menu](./img/modal.png)
+![Popup menu](./img/modal.png)
 
 Applying a template stores it via the `modelerTemplate` property and the optional `modelerTemplateVersion` property
 on the selected element:
@@ -25,9 +25,14 @@ on the selected element:
                   zeebe:modelerTemplateVesion="1"/>
 ```
 
-It also sets up custom fields on the diagram element and make these available to the user for inspection and editing.
-Properties which were not configured in the element template using custom fields will not be available for editing for
-the user.
+It also sets up custom fields on the diagram element and makes these available for inspection and editing.
+Properties which were not configured in the element template using custom fields will not be available for editing.
+
+### Applying a template that defines operations
+
+Templates that define [operations](/components/modeler/element-templates/template-metadata.md#predefined-configurations-steps-and-presets) — for example, a connector template for a service with several operations — show their operations in the popup menu instead of applying the template directly. Select an operation to apply the template with that operation preselected, then complete the remaining fields in the properties panel.
+
+Operations are also matched by search, so you can search for the action you want to perform, such as `upload object`, without knowing which template provides it. Search matches an operation's name, description, and keywords together with those of its parent operations and its template.
 
 ## Removing templates
 
@@ -46,9 +51,9 @@ If a template is applied and a new version of the template is found you can _upd
 
 Templates are updated according to the following rules:
 
-- If the property is set in new template, it will override unless the property was set by the old template and changed afterwards.
+- If the property is set in the new template, it will override the existing value — unless the value was originally set by the old template and has been manually changed since.
 - If the property is not defined in the new template, it will unset.
-- Sub-properties of complex properties (e.g. `zeebe:input`, `zeebe:output`) are handled
+- Sub-properties of complex properties (for example, `zeebe:input`, `zeebe:output`) are handled
   according to these rules if they can be identified.
 
 ### Replacing templates
@@ -56,10 +61,10 @@ Templates are updated according to the following rules:
 If a template is deprecated with a new element template and you want to keep the same input values as in the
 deprecated template, you can:
 
-- **Unlink**: Remove the current template that is deprecated from the `modelerTemplate` property, but keep the properties
-  which
-  were set.
-- **Select** and apply the new element template.
+1. **Unlink**: Remove the current template that is deprecated from the `modelerTemplate` property, but keep the properties
+   which
+   were set.
+2. **Select** and apply the new element template.
 
 ## Missing templates
 

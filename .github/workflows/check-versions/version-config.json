@@ -1,22 +1,12 @@
 [
   {
-    "version": "next",
+    "version": "8.10 (next)",
     "source": "docs/",
-    "suggestions": ["versioned_docs/version-8.5/"]
+    "suggestions": ["versioned_docs/version-8.9/"]
   },
   {
-    "version": "current (main docs)",
-    "source": "versioned_docs/version-8.5/",
+    "version": "8.9 (current)",
+    "source": "versioned_docs/version-8.9/",
     "suggestions": ["docs/"]
-  },
-  {
-    "version": "next",
-    "source": "optimize/",
-    "suggestions": ["optimize_versioned_docs/version-3.13.0/"]
-  },
-  {
-    "version": "current",
-    "source": "optimize_versioned_docs/version-3.13.0/",
-    "suggestions": ["optimize/"]
   }
 ]

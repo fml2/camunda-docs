@@ -1,10 +1,10 @@
 ---
 id: telemetry
 title: Telemetry
-description: "Opt in for the collection of telemetry data using Desktop Modeler. This data is used to better understand how the application is used and to improve it."
+description: "Opt out for the collection of telemetry data using Desktop Modeler. This data is used to better understand how the application is used and to improve it."
 ---
 
-You can opt in for the collection of telemetry data when using Desktop Modeler. This data is used to better understand how the application is used and to improve it based on data. This page summarizes the data collected.
+You can opt out for the collection of telemetry data when using Desktop Modeler. This data is used to better understand how the application is used and to improve it based on data. This page summarizes the data collected.
 
 ## General structure of the events
 
@@ -12,7 +12,7 @@ The events **Desktop Modeler** sends share a similar payload which usually (but 
 
 - **event name**: The name of the event triggered (e.g. `diagram:opened`)
 - **application version**: The version of Desktop Modeler being used (e.g. Version 5.0.0)
-- **editor id**: A randomly generated id assigned to your Desktop Modeler installation
+- **editor id**: A randomly generated ID assigned to your Desktop Modeler installation
 
 ## Definition of events
 
@@ -54,8 +54,8 @@ These events include the following properties:
 
 - `diagramType`: BPMN, DMN, or Form
 - Engine profile:
-  - `executionPlatform`: <target platform\>
-  - `executionPlatformVersion`: <target platform version\>
+  - `executionPlatform`: &lt;target platform\>
+  - `executionPlatformVersion`: &lt;target platform version\>
 
 In the case of a form, the payload also includes the `formFieldTypes`:
 
@@ -78,8 +78,8 @@ The `Deployment Event` and `Start Instance` have the following properties:
 
 - `diagramType`: BPMN, DMN, or Form
 - Engine profile:
-  - `executionPlatform`: <target platform\>
-  - `executionPlatformVersion`: <target platform version\>
+  - `executionPlatform`: &lt;target platform\>
+  - `executionPlatformVersion`: &lt;target platform version\>
 
 In the event of an unsuccessful deployment, an `error` property will be present in the payload containing an error code.
 
@@ -106,7 +106,7 @@ Currently, these containers are:
 
 The event supplies:
 
-- The `parent` container id to locate the application section
+- The `parent` container ID to locate the application section
 - The button label or link text (generalized as label) for identification of what was specifically clicked
 - A type to differentiate buttons, internal links, and external links
 - The link target (optional for external links)
@@ -173,7 +173,7 @@ In all events [the execution platform and version](#diagram-openedclosed-event) 
 BPMN editor events are sent on different interactions with the BPMN editor:
 
 - User created, appended, or replaced an element on the canvas. These events include the `oldElement`/`sourceElement` (when applicable) and the new element(s).
-- User selected, updated, unlinked, or removed an element template from an element via the properties panel. These events include the current diagram `selection` and respective element templates.
+- User selected, updated, unlinked, or removed an element template from an element via the properties panel on the right side of the screen. These events include the current diagram `selection` and respective element templates.
 - User interacted with the pop-up menu, context menu, or the palette. These events include the target (`entryId`, `entryGroup`, `entryTitle`) and `triggerType` (`"click"`, `"drag"`, or `"keyboard"`) of the interaction, as well as the current diagram `selection`.
 
 Example event:
@@ -191,5 +191,63 @@ Example event:
     }
   ],
   "triggerType": "keyboard"
+}
+```
+
+### Task testing events
+
+Task testing events are sent when using the [task testing](../task-testing.md) feature:
+
+- Task execution is started. This event includes `elementType` and `elementTemplate` if applied.
+- Task testing deployment. [Deployment event](#deployment-and-start-instance-events) is triggered when the process is deployed during task testing.
+- Task execution finished. This event includes `elementType`, `elementTemplate`, `success` boolean value, and `incidentType` if task testing resulted in an [incident](../../../concepts/incidents.md).
+
+Example task testing finished event:
+
+```json
+{
+  "elementType": "bpmn:ServiceTask",
+  "elementTemplate": "io.camunda.connectors.HttpJson.v2",
+  "success": false,
+  "incidentType": "JOB_NO_RETRIES"
+}
+```
+
+### Variables panel events
+
+Variables panel events are sent on different interactions with the [Variables](../../data-handling.md#inspecting-variables) panel:
+
+- User opened the variables panel.
+- User closed the variables panel.
+- User filtered variables using the search input. The search term is not included in the event.
+- User expanded or collapsed a scope section.
+- User expanded or collapsed a variable row.
+- User copied a variable name via the copy button.
+- User copied a variable path or value via the context menu.
+
+These events do not include any additional payload data.
+
+### Connection event
+
+The `Connection Event` is sent in the following situations:
+
+- Desktop Modeler fails to connect to [a configured cluster](../connect-to-camunda-8.md).
+- Desktop Modeler connects to a configured cluster.
+
+The `Connection Event` includes the following properties:
+
+- `success`: `true` or `false`
+- `targetType`: `SaaS` or `Self-Managed`
+- `isLocal`: `true` or `false`
+- `reason`: An error reason, or `null`
+
+Example connection event:
+
+```json
+{
+  "success": true,
+  "targetType": "Self-Managed",
+  "isLocal": true,
+  "reason": null
 }
 ```

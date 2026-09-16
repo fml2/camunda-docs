@@ -1,0 +1,406 @@
+---
+id: get-usage-metrics
+title: "Get usage metrics"
+description: "<MarkerEventuallyConsistentExtension />"
+sidebar_label: "Get usage metrics"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "get api-method"
+info_path: versioned_docs/version-8.8/apis-tools/orchestration-cluster-api-rest/specifications/orchestration-cluster-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MarkerEventuallyConsistentExtension from "@site/src/mdx/MarkerEventuallyConsistentExtension";
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get usage metrics"}
+></Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/system/usage-metrics"}
+  context={"endpoint"}
+></MethodEndpoint>
+
+<MarkerEventuallyConsistentExtension />
+
+Retrieve the usage metrics based on given criteria.
+
+<Heading id={"request"} as={"h2"} className={"openapi-tabs__heading"}>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails
+  parameters={[
+    {
+      name: "startTime",
+      in: "query",
+      required: true,
+      description:
+        "The start date for usage metrics, including this date. Value in ISO 8601 format.",
+      schema: {
+        type: "string",
+        format: "date-time",
+        example: "2025-06-07T13:14:15Z",
+      },
+    },
+    {
+      name: "endTime",
+      in: "query",
+      required: true,
+      description:
+        "The end date for usage metrics, including this date. Value in ISO 8601 format.",
+      schema: {
+        type: "string",
+        format: "date-time",
+        example: "2025-06-07T13:14:15Z",
+      },
+    },
+    {
+      name: "tenantId",
+      in: "query",
+      required: false,
+      description:
+        "Restrict results to a specific tenant ID. If not provided, results for all tenants are returned.",
+      schema: {
+        example: "customer-service",
+        description: "The unique identifier of the tenant.",
+        format: "TenantId",
+        type: "string",
+        title: "TenantId",
+      },
+    },
+    {
+      name: "withTenants",
+      in: "query",
+      required: false,
+      description:
+        "Whether to return tenant metrics in addition to the total metrics or not. Default false.",
+      schema: { type: "boolean", default: false },
+    },
+  ]}
+></ParamsDetails>
+
+<RequestSchema title={"Body"} body={undefined}></RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{
+    "200": {
+      description: "The usage metrics search result.",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            allOf: [
+              {
+                type: "object",
+                properties: {
+                  processInstances: {
+                    description:
+                      "The amount of created root process instances.",
+                    type: "integer",
+                    format: "int64",
+                  },
+                  decisionInstances: {
+                    description: "The amount of executed decision instances.",
+                    type: "integer",
+                    format: "int64",
+                  },
+                  assignees: {
+                    description: "The amount of unique active task users.",
+                    type: "integer",
+                    format: "int64",
+                  },
+                },
+                title: "UsageMetricsResponseItem",
+              },
+            ],
+            properties: {
+              activeTenants: {
+                description: "The amount of active tenants.",
+                type: "integer",
+                format: "int64",
+              },
+              tenants: {
+                description:
+                  "The usage metrics by tenants. Only available if request `withTenants` query parameter was `true`.",
+                type: "object",
+                additionalProperties: {
+                  type: "object",
+                  title: "The tenant ID.",
+                  description: "The usage metrics for the specific tenant.",
+                  allOf: [
+                    {
+                      type: "object",
+                      properties: {
+                        processInstances: {
+                          description:
+                            "The amount of created root process instances.",
+                          type: "integer",
+                          format: "int64",
+                        },
+                        decisionInstances: {
+                          description:
+                            "The amount of executed decision instances.",
+                          type: "integer",
+                          format: "int64",
+                        },
+                        assignees: {
+                          description:
+                            "The amount of unique active task users.",
+                          type: "integer",
+                          format: "int64",
+                        },
+                      },
+                      title: "UsageMetricsResponseItem",
+                    },
+                  ],
+                },
+              },
+            },
+            title: "UsageMetricsResponse",
+          },
+          examples: {
+            "Response without tenants": {
+              value: {
+                processInstances: 5,
+                decisionInstances: 23,
+                activeTenants: 2,
+                assignees: 3,
+                tenants: {},
+              },
+            },
+            "Response with tenants": {
+              value: {
+                processInstances: 5,
+                decisionInstances: 23,
+                activeTenants: 2,
+                assignees: 3,
+                tenants: {
+                  tenant1: {
+                    processInstances: 1,
+                    decisionInstances: 2,
+                    assignees: 1,
+                  },
+                  tenant2: {
+                    processInstances: 4,
+                    decisionInstances: 21,
+                    assignees: 3,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "400": {
+      description: "The provided data is not valid.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "401": {
+      description: "The request lacks valid authentication credentials.",
+      headers: { "WWW-Authenticate": { schema: { type: "string" } } },
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "403": {
+      description: "Forbidden. The request is not allowed.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "500": {
+      description: "An internal error occurred while processing the request.\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+  }}
+></StatusCodes>

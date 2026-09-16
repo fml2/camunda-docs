@@ -1,9 +1,5 @@
 ---
 title: "Handling data in processes"
-tags:
-  - BPMN Data Object
-  - Variable
-  - Serialization
 description: "When using Camunda, you have access to a dynamic map of process variables, which lets you associate data to every single process instance."
 ---
 
@@ -48,7 +44,7 @@ In Camunda 8, [values are stored as JSON](/components/concepts/variables.md#vari
 This best practice describes variable handling within Camunda 8. Process variables are handled slightly differently with Camunda 7. Consult the [Camunda 7 documentation](https://docs.camunda.org/manual/latest/user-guide/process-engine/variables/) for details. In essence, variable values are not handled as JSON and thus there are [different values](https://docs.camunda.org/manual/latest/user-guide/process-engine/variables/#supported-variable-values) supported.
 :::
 
-You can dynamically create such variables by assigning an object of choice to a (string typed) variable name; for example, by passing a `Map<String, Object>` when [completing](../../../apis-tools/tasklist-api/mutations/complete-task.mdx) the "Review tweet" task via the API:
+You can dynamically create such variables by assigning an object of choice to a (string typed) variable name; for example, by passing a `Map<String, Object>` when [completing](/apis-tools/orchestration-cluster-api-rest/specifications/complete-user-task.api.mdx) the "Review tweet" task via the API:
 
 ```
 // TODO: Double check!
@@ -67,13 +63,13 @@ In Camunda, you do _not_ declare process variables in the process model. This al
 
 Consult the [docs about variables](/components/concepts/variables.md#variable-values) to learn more.
 
-Camunda does not treat BPMN **data objects** (<img src="/img/bpmn-elements/data-object.svg" width="60" />) as process variables. We recommend using them occasionally _for documentation_, but you need to [avoid excessive usage of data objects](../../modeling/creating-readable-process-models#avoiding-excessive-usage-of-data-objects).
+Camunda does not treat BPMN **data objects** (<img src="/img/bpmn-elements/data-object.svg" width="60" alt="BPMN data object" />) as process variables. We recommend using them occasionally _for documentation_, but you need to [avoid excessive usage of data objects](../../modeling/creating-readable-process-models#avoiding-excessive-usage-of-data-objects).
 
 ## Storing just the relevant data
 
-Do not excessively use process variables. As a rule of thumb, store _as few variables as possible_ within Camunda.
+Do not excessively use process variables. Process variables are subject to [size limitations](/components/concepts/variables.md#variable-size-limitation), so as a rule of thumb, store _as few variables as possible_ within Camunda.
 
-Please note the [technical limitations of variables sizes](/components/concepts/variables.md#variable-size-limitation).
+Keep this limitation in mind when designing your BPMN processes. For example, an AI agent’s context is stored in a process variable by default and counts toward this size limit. Alternatively, you can store the conversation in document storage. See [choose a memory storage backend](/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-subprocess.md#choose-a-memory-storage-backend).
 
 ### Storing references only
 

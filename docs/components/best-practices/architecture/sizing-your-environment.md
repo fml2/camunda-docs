@@ -1,256 +1,315 @@
 ---
 id: sizing-your-environment
-title: Sizing your environment
-tags:
-  - Database
-  - Performance
-  - Hardware
-  - Sizing
-description: "Define and size your environment for Camunda 8 appropriately by understanding the factors that influence hardware requirements."
+title: Size your environment
+description: "Understand the aspects relevant to Camunda 8 sizing. Once you do, use the sizing recommendations for [SaaS](sizing-saas.md) or [Self-Managed](sizing-self-managed.md) to select your appropriate configuration."
 ---
 
-In order to define and size your environment for Camunda 8 appropriately, you need to understand the factors that influence hardware requirements. Then you can apply this knowledge to select the appropriate Camunda 8 SaaS hardware package or size your self-managed Kubernetes cluster.
+Understand the aspects relevant to Camunda 8 sizing. Once you do, use the sizing recommendations for [SaaS](sizing-saas.md) or [Self-Managed](sizing-self-managed.md) to select your appropriate configuration.
 
-:::caution Camunda 8 only
-This best practice targets Camunda 8 only! If you are looking at Camunda 7, please visit [Sizing your Camunda 7 environment](../sizing-your-environment-c7/).
+:::tip Before you size
+See [Data flow](data-flow.md) first to understand the factors that drive the recommendations on this page.
 :::
 
-## Understanding influencing factors
+<!-- Anchors for backward compatibility with old single-page URLs -->
+<span id="camunda-8-saas" />
+<span id="camunda-8-self-managed" />
+<span id="running-experiments-and-benchmarks" />
 
-Let's understand the important numbers.
+## Sizing requirements and influencing factors
 
-### Throughput
+Consider the following aspects when planning and sizing Camunda SaaS or Self-Managed.
 
-Throughput defines, how many process instances can be executed in a certain timeframe.
+### Data availability latency
 
-It is typically easy to estimate the number of **process instances per day** you need to execute. If you only know the number of process instances per year, we recommend to divide this number by the 250 (average number of working days in a year).
+Data availability latency is the time between an event occurring in the engine and it being queryable in Operate, Tasklist, or Optimize. Under heavy load or with Optimize enabled, this can lag from seconds to minutes.
 
-But the hardware sizing depends more on the **number of BPMN tasks** in a process model. For example, you will have a much higher throughput for processes with one service task than for processes with 30 service tasks.
+Data availability latency is influenced by:
 
-If you already know your future process model, you can use this to count the number of tasks for your process. For example, the following onboarding process contains five service tasks in a typical execution.
-
-<div bpmn="best-practices/sizing-your-environment-assets/customer_onboarding.bpmn" callouts="task1,task2,task3,task4,task5" />
-
-If you don't yet know the number of service tasks, we recommend to assume 10 service tasks as a rule of thumb.
-
-The number of tasks per process allows you to calculate the required number of **tasks per day (tasks/day)** which can also be converted into **tasks per second (tasks/s)** (divide by 24 hours \* 60 minutes \* 60 seconds).
-
-**Example:**
-
-| Indicator                          |    Number | Calculation method | Comment                                     |
-| :--------------------------------- | --------: | :----------------: | :------------------------------------------ |
-| Onboarding instances per year      | 5,000,000 |                    | Business input                              |
-| Process instances per business day |    20,000 |       / 250        | average number of working days in a year    |
-| Tasks per day                      |   100,000 |        \* 5        | Tasks in the process model as counted above |
-| Tasks per second                   |      1.16 |   / (24\*60\*60)   | Seconds per day                             |
-
-In most cases, we define throughput per day, as this time frame is easier to understand. But in high-performance use cases you might need to define the throughput per second.
-
-### Peak loads
-
-In most scenarios, your load will be volatile and not constant. For example, your company might start 90% of their monthly process instances in the same day of the month. The **ability to handle those peaks is the more crucial requirement and should drive your decision** instead of looking at the average load.
-
-In the above example, that one day with the peak load defines your overall throughput requirements.
-
-Sometimes, looking at peaks might also mean, that you are not looking at all 24 hours of a day, but only 8 business hours, or probably the busiest 2 hours of a day, depending on your typical workload.
-
-### Latency and cycle time
-
-In some use cases, the cycle time of a process (or sometimes even the cycle time of single tasks) matter. For example, you want to provide a REST endpoint, that starts a process instance to calculate a score for a customer. This process needs to execute four service tasks, but the REST request should return a response synchronously, no later than 250 milliseconds after the request.
-
-While the cycle time of service tasks depends very much on what you do in these tasks, the overhead of the workflow engine itself can be measured. In an experiment with Camunda 8 1.2.4, running all worker code in the same GCP zone as Camunda 8, we measured around 10ms processing time per process node and approximately 50 ms latency to process service tasks in remote workers. Hence, to execute 4 service tasks results in 240 ms workflow engine overhead.
-
-The closer you push throughput to the limits, the more latency you will get. This is basically, because the different requests compete for hardware resources, especially disk write operations. As a consequence, whenever cycle time and latency matters to you, you should plan for hardware buffer to not utilize your cluster too much. This makes sure, your latency does not go up because of resource contention. A good rule of thumb is to multiply your average load by 20. This means, you cannot only accommodate unexpected peak loads, but also have more free resources on average, keeping latency down.
-
-| Indicator                                                      |    Number | Calculation method | Comment                                                                                 |
-| :------------------------------------------------------------- | --------: | :----------------: | :-------------------------------------------------------------------------------------- |
-| Onboarding instances per year                                  | 5,000,000 |                    | Business input, but irrelevant                                                          |
-| Expected process instances on peak day                         |   150,000 |                    | Business input                                                                          |
-| Process instances per second within business hours on peak day |      5.20 |   / (8\*60\*60)    | Only looking at seconds of the 8 business hours of a day                                |
-| Process instances per second including buffer                  |    104.16 |       \* 20        | Adding some buffer is recommended in critical high-performance or low-latency use cases |
-
-### Payload size
-
-Every process instance can hold a payload (known as [process variables](/components/concepts/variables.md)). The payload of all running process instances must be managed by the runtime workflow engine, and all data of running and ended process instances is also forwarded to Operate and Optimize.
-
-The data you attach to a process instance (process variables) influences resource requirements. For example, it makes a big difference if you only add one or two strings (requiring around 1 KB of space) to your process instances, or a full JSON document containing 1 MB. Hence, the payload size is an important factor when looking at sizing.
-
-There are a few general rules regarding payload size:
-
-- The maximum [variable size per process instance is limited](/components/concepts/variables.md#variable-size-limitation), currently to roughly 3 MB.
-- We don't recommend storing much data in your process context. Refer to our [best practice on handling data in processes](/components/best-practices/development/handling-data-in-processes.md).
-- Every [partition](/components/zeebe/technical-concepts/partitions.md) of the Zeebe installation can typically handle up to 1 GB of payload in total. Larger payloads can lead to slower processing. For example, if you run one million process instances with 4 KB of data each, you end up with 3.9 GB of data, and you should run at least four partitions. In reality, this typically means six partitions, as you want to run the number of partitions as a multiple of the replication factor, which by default is three.
-
-The payload size also affects disk space requirements, as described in the next section.
+- **Exporter throughput:** The rate at which the Camunda Exporter can write events to Elasticsearch (ES).
+- **Elasticsearch indexing speed:** How quickly ES can index incoming documents.
+- **Elasticsearch disk usage:** High disk utilization (above ~70%) significantly increases indexing latency. Monitor ES disk usage and scale storage before hitting this threshold.
 
 ### Disk space
 
-The workflow engine itself will store data along every process instance, especially to keep the current state persistent. This is unavoidable. In case there are human tasks, data is also sent to Tasklist and kept there, until tasks are completed.
+The workflow engine stores data for each process instance, especially to persist the current state.
+In addition, it sends data to secondary storage (Elasticsearch, OpenSearch, or an RDBMS) for indexing, search, analytics, and long-term retention.
 
-Furthermore, data is also sent from Operate and Optimize, which store data in Elasticsearch. These tools keep historical audit data for the configured retention times. The total amount of disk space can be reduced by using **data retention settings**. We typically delete data in Operate after 30 to 90 days, but keep it in Optimize for a longer period of time to allow more analysis. A good rule of thumb is something between 6 and 18 months.
+You can configure retention times for data stored in secondary storage.
 
-:::note
-Elasticsearch needs enough memory available to load a large amount of this data into memory.
-:::
+For Self-Managed, see [Disk space](sizing-self-managed.md#disk-space) for the formula and mechanics behind Zeebe's primary storage disk usage.
 
-Assuming a [typical payload of 15 process variables (simple strings, numbers or booleans)](https://github.com/camunda/camunda/blob/main/zeebe/benchmarks/project/src/main/resources/bpmn/typical_payload.json) we measured the following approximations for disk space requirements using Camunda 8 SaaS 1.2.4. Please note, that these are not exact numbers, but they might give you an idea what to expect:
+### Impact of Optimize
 
-- Zeebe: 75 kb / PI
-- Operate: 57 kb / PI
-- Optimize: 21 kb / PI
-- Tasklist: 21 kb / PI
-- Sum: 174 kb / PI
-
-Using your throughput and retention settings, you can now calculate the required disk space for your scenario. Example:
-
-| Indicator                  | Calculation method |          Value | Comments                                                                                           |
-| :------------------------- | :----------------: | -------------: | :------------------------------------------------------------------------------------------------- |
-| Process instances per day  |                    |         20,000 |                                                                                                    |
-| **Runtime**                |                    |                |                                                                                                    |
-| Typical process cycle time |     \* 5 days      |        100,000 | How long is a process instance typically active? Determines the number of active process instances |
-| Disk space for Zeebe       |     \* 75 kib      |       7.15 GiB | (Converted into GB by / 1024 / 1024)                                                               |
-| Disk space for Tasklist    |     \* 21 kib      |       0.67 GiB |                                                                                                    |
-| **Operate**                |                    |                |                                                                                                    |
-| PI in retention time       |     \* 30 day      |        600,000 |                                                                                                    |
-| Disk space                 |     \* 57 kib      |      32.62 GiB |                                                                                                    |
-| **Optimize**               |                    |                |                                                                                                    |
-| PI in retention time       |    \* 6 months     |      3,600,000 |                                                                                                    |
-| Disk space                 |     \* 21 kib      |      72.10 GiB |                                                                                                    |
-| **Sum**                    |                    | **113.87 GiB** |                                                                                                    |
-
-## Understanding sizing and scalability behavior
-
-Spinning up a Camunda 8 Cluster means you run multiple components that all need resources in the background, like the Zeebe broker, Elasticsearch (as the database for Operate, Tasklist, and Optimize), Operate, Tasklist, and Optimize. All those components need to be equipped with resources.
-
-All components are clustered to provide high-availability, fault-tolerance and resiliency.
-
-Zeebe scales horizontally by adding more cluster nodes (pods). This is **limited by the [number of partitions](/components/zeebe/technical-concepts/partitions.md)** configured for a Zeebe cluster, as the work within one partition cannot be parallelized by design. Hence, you need to define enough partitions to utilize your hardware. The **number of partitions cannot be changed after the cluster was initially provisioned** (at least not yet), elastic scalability of partitions is not yet possible.
-
-If you anticipate the load increasing over time, prepare by configuring more partitions than you currently need as a buffer. For example, you could multiply the number of partitions you need for your current load by four to add a buffer. This typically has just a small impact on performance.
-
-Camunda 8 runs on Kubernetes. Every component is operated as a so-called pod, that gets resources assigned. These resources can be vertically scaled (=get more or less hardware resources assigned dynamically) within certain limits. Note that vertically scaling not always results in more throughput, as the various components have dependencies on each other. This is a complex topic and requires running experiments with benchmarks. In general, we recommend to start with the minimalistic hardware package as described below. If you have further requirements, you use this as a starting point to increase resources.
-
-Note that Camunda licensing does not depend on the provisioned hardware resources, making it easy to size according to your needs.
-
-## Sizing your runtime environment
-
-First, calculate your requirements using the information provided above, taking the example calculations from above:
-
-- Throughput: 20,000 process instances / day
-- Disk space: 114 GB
-
-Now you can select a hardware package that can cover these requirements. In this example this fits well into a cluster of size 2x.
-
-### Camunda 8 SaaS
-
-Camunda 8 defines four [cluster sizes](/components/concepts/clusters.md#cluster-size) you can select from (1x, 2x, 3x, and 4x) after you have chosen your [cluster type](/components/concepts/clusters.md#cluster-type). The following table gives you an indication of what requirements you can fulfill with each cluster size.
+Optimize is an optional component that provides process analytics and reporting. When enabled, it has significant implications for sizing.
 
 :::note
-Contact your Customer Success Manager if you require a custom cluster size above these requirements.
+The data below comes from Camunda 8.9 load tests. Because 8.8 and 8.9 share the same exporter architecture, it applies to 8.8+ as well.
 :::
 
-| Cluster size                                                                        |                                 1x |                                  2x |                               3x |                               4x |
-| :---------------------------------------------------------------------------------- | ---------------------------------: | ----------------------------------: | -------------------------------: | -------------------------------: |
-| Max Throughput **Tasks/day** **\***                                                 |                              4.3 M |                               8.6 M |                           12.9 M |                           17.2 M |
-| Max Throughput **Tasks/second** **\***                                              |                                 50 |                                 100 |                              150 |                              200 |
-| Max Throughput **Process Instances/day** **\*\***                                   |                                3 M |                                 6 M |                              9 M |                             12 M |
-| Max Total Number of Process Instances stored (in Elasticsearch in total) **\*\*\*** |                               75 k |                               150 k |                            225 k |                            300 k |
-| Approximate resources provisioned **\*\*\*\***                                      | 11 vCPU, 22 GB memory, 64 GB disk. | 22 vCPU, 44 GB memory, 128 GB disk. | 33 vCPU, 66 GB mem, 192 GB disk. | 44 vCPU, 88 GB mem, 256 GB disk. |
+#### In short
 
-The numbers in the table were measured using Camunda 8 (version 8.6), [the benchmark project](https://github.com/camunda-community-hub/camunda-8-benchmark) running on its own Kubernetes Cluster, and using a [realistic process](https://github.com/camunda/camunda/blob/main/zeebe/benchmarks/project/src/main/resources/bpmn/realistic/bankCustomerComplaintDisputeHandling.bpmn) containing a mix of BPMN symbols such as tasks, events and call activities including subprocesses. To calculate day-based metrics, an equal distribution over 24 hours is assumed.
+- Enabling Optimize roughly **triples to quadruples Elasticsearch CPU and disk usage** at a [realistic workload](./sizing-benchmarks.md#reference-benchmark-scenario) (around 3.4x CPU and 3.6x disk), largely independent of throughput.
+- It lowers achievable **processing throughput by 25-50% at maximum load** on the same hardware.
+- The single most effective mitigation is to **keep variables out of Optimize**. This recovers around 60% of the storage and 65% of the CPU, plus most of the lost throughput, at the cost of variable-based analytics.
+- Size Elasticsearch/OpenSearch accordingly (CPU, disk, **and shard budget**), or run Optimize on a **dedicated Elasticsearch/OpenSearch instance**.
 
-**\*** Tasks (Service Tasks, Send Tasks, User Tasks, and so on) completed per day is the primary metric, as this is easy to measure and has a strong influence on resource consumption. This number assumes a constant load over the day. Tasks/day and Tasks/ second are scaled linearly.
+For how Optimize fits into the export pipeline, see [Optimize data flow](./data-flow.md#optimize-data-flow). The full studies behind these numbers are [Impact of Optimize on Camunda](https://camunda.github.io/zeebe-chaos/2026/06/10/Impact-of-Optimize-on-Camunda) and [Reducing Optimize's Elasticsearch overhead](https://camunda.github.io/zeebe-chaos/2026/06/25/Impact-of-Optimize-Variable-Filtering).
 
-**\*\*** As Tasks are the primary resource driver, the number of process instances supported by a cluster is calculated based on the assumption of an average of 10 tasks per process. Customers can calculate a more accurate process instance estimate using their anticipated number of tasks per process.
+#### Why Optimize matters for sizing
 
-**\*\*\*** Total number of process instances within the retention period, regardless of if they are active or finished. This is limited by disk space, CPU, and memory for running and historical process instances available to ElasticSearch. Calculated assuming a typical set of process variables for process instances. Note that it makes a difference if you add one or two strings (requiring ~ 1kb of space) to your process instances, or if you attach a full JSON document containing 1MB, as this data needs to be stored in various places, influencing memory and disk requirements. If this number increases, you can still retain the runtime throughput, but Tasklist, Operate, and/or Optimize may lag behind.
+- Optimize is a second-tier consumer of the export pipeline: the Elasticsearch/OpenSearch exporter writes raw engine events, Optimize's importer reads them and writes its own analytics indices back to Elasticsearch/OpenSearch, so data is written to secondary storage twice. See [Optimize data flow](./data-flow.md#optimize-data-flow).
+- In Camunda 8.8+, the Camunda Exporter and the Elasticsearch exporter run in the same thread within the broker, so Optimize data-pipeline competes directly with core platform exporting for throughput.
+- The overhead is **not proportional to throughput.** It scales with process model complexity (multi-instance and call activities) and variable volume. At a realistic workload where Optimize-enabled and Optimize-disabled clusters reached identical throughput with zero backpressure, the Optimize-enabled cluster still consumed **around 3.4x more Elasticsearch CPU.** Budget for this even at comfortable throughput.
 
-Data retention has an influence on the amount of data that is kept for completed instances in your cluster. The default data retention is set to 30 days, which means that data that is older than 30 days gets removed from Operate and Tasklist. If a process instance is still active, it is fully functioning in runtime, but customers are not able to access historical data older than 30 days from Operate and Tasklist. Data retention is set to 6 months, meaning that data that is older than 6 months will be removed from Optimize. Up to certain limits data retention can be adjusted by Camunda on request. See [Camunda 8 SaaS data retention](/components/concepts/data-retention.md).
+#### What Optimize affects
 
-**\*\*\*\*** These are the resource limits configured in the Kubernetes cluster and are always subject to change.
+At a [realistic workload](./sizing-benchmarks.md#reference-benchmark-scenario), with Optimize enabled vs. disabled:
 
-You might wonder why the total number of process instances stored is that low. This is related to limited resources provided to Elasticsearch, yielding performance problems with too much data stored there. By increasing the available memory to Elasticsearch you can also increase that number. At the same time, even with this rather low number, you can always guarantee the throughput of the core workflow engine during peak loads, as this performance is not influenced. Also, you can always increase memory for Elasticsearch later on if it is required.
+- **Elasticsearch CPU:** around 3.4x higher.
+- **Elasticsearch disk:** around 3.6x more total data.
+- **Throughput:** unaffected at a realistic workload, but 25-50% lower at maximum load on the same hardware.
+- **Write-to-exporting latency:** around 2.6x higher.
+- **Backpressure at maximum load:** around 45% with Optimize vs. 35% without.
+- **Individual import latency:** increases approximately linearly with payload size.
+- **Report loading times:** increase approximately linearly with the data complexity (such as process instances and variables) and as historical data accumulates.
 
-### Camunda 8 Self-Managed
+Secondary storage memory is not a meaningful differentiator for improving performance.
 
-Provisioning Camunda 8 onto your Self-Managed Kubernetes cluster might depend on various factors. For example, most customers already have their own teams providing Elasticsearch for them as a service.
+:::tip
+**Watch Optimize import lag.** When Optimize's importer falls behind the export rate, two problems can appear:
 
-However, the following example shows a possible configuration which is close to a cluster of size 1x in Camunda 8 SaaS, which can serve as a starting point for your own sizing.
+- **Optimize's analytics indices grow.** Optimize keeps one document per process instance and can only apply retention-based cleanup once its importer has processed the instance's completion. While the importer lags, completions are recorded late, cleanup is deferred, and Optimize's own indices grow beyond their steady-state size.
+- **Data can be missed.** The raw exporter indices are cleaned up on the Elasticsearch/OpenSearch retention schedule. If the importer falls far enough behind, those records are deleted before Optimize imports them, and that data never reaches Optimize. This Exporter-Importer hazard is exactly what the 8.8 Camunda Exporter architecture removed for Operate and Tasklist.
+
+Track import progress with the [Optimize metrics and bundled Grafana dashboards](/self-managed/operational-guides/monitoring/metrics.md). If you see persistent import lag, raise the import throughput (see [mitigations](#mitigations) for details).
+:::
+
+#### Mitigations
+
+##### Keep variables out of Optimize (highest impact, lowest risk)
+
+Variables account for most of Optimize's storage and CPU usage in the secondary storage layer. In benchmarks, disabling Optimize's variable storage reduced its disk usage by a factor of **approximately 14** relative to the raw export. Isolating a group of customer-related variables showed an even larger difference, a factor of **approximately 29**, driven primarily by object variable flattening, described below, rather than by the variable values themselves. See [Optimize data flow](./data-flow.md#optimize-data-flow) for an explanation of the underlying storage mechanism.
+
+Almost all of this cost comes from Optimize's indices. The following three levers are listed from most to least aggressive:
+
+- **Stop exporting variables entirely.** Set `camunda.data.exporters.elasticsearch.args.index.variable: false` (OpenSearch: `camunda.data.exporters.opensearch.args.index.variable: false`) at the exporter to drop all variable records. This is the only lever that also recovers throughput because the exporter write path is the bottleneck at maximum load.
+- **Export only the variables you need (name and prefix filters).** Keep a subset with name or prefix filters, for example only `customer`-prefixed variables. Use this when some variables drive Optimize reports, but most are noise. On SaaS, configure variable name filters in [cluster settings](/components/hub/organization/manage-clusters/settings.md#data-filters). On Self-Managed, see [Optimize export filtering](/self-managed/components/optimize/configuration/optimize-export-filtering.md).
+- **[Disable variable import](/self-managed/components/optimize/configuration/variable-import.md) in Optimize.** Available on all supported versions; achieves the storage savings but does not recover throughput, because the records are still written by the exporter.
+
+**Trade-off:** Filtered variables are unavailable in Optimize reports, including variable filters, variable-based grouping, and raw-data variable columns. These levers affect **Optimize only**; Operate and Tasklist read through the Camunda Exporter, so their variables stay intact.
+
+##### Disable object variable flattening (high impact for object-heavy processes)
+
+By default, Optimize [flattens each object variable](/self-managed/components/optimize/configuration/object-variables.md) into a separate variable for each property and stores the full raw object as another variable. Each generated variable incurs its own storage cost, so an object variable with several properties can require several times more storage than a single scalar variable.
+
+If you don't rely on flattened object-variable filtering, grouping, or raw-data columns in Optimize reports, disable it by setting:
+
+- Environment variable: `CAMUNDA_OPTIMIZE_ZEEBE_INCLUDE_OBJECT_VARIABLE=false`
+- Configuration property: `zeebe.includeObjectVariableValue: false`
 
 :::note
-Such a cluster can serve roughly 65 tasks per second as a peak load, and it can store up to 100,000 process instances in Elasticsearch (in-flight and history) before running out of disk-space.
+This behavior is enabled by default in Self-Managed and disabled in Camunda 8 SaaS.
 :::
 
-|                                    |                     | request | limit |
-| ---------------------------------- | ------------------- | ------- | ----- |
-| **Zeebe**                          |                     |         |       |
-| \# brokers                         | 3                   |         |       |
-| \# partitions                      | 3                   |         |       |
-| replication factor                 | 3                   |         |       |
-|                                    | vCPU \[cores\]      | 0.8     | 0.96  |
-|                                    | Mem \[GB\]          | 2       | 4     |
-|                                    | Disk \[GB\]         | 32      | 192   |
-| gateway                            | embedded in broker  |         |       |
-| **Operate**                        |                     |         |       |
-| #importer                          | 1                   |         |       |
-|                                    | vCPU \[cores\]      | 0.3     | 1     |
-|                                    | Mem \[GB\] limit    | 0.2     | 1     |
-| #webapp                            | 2                   |         |       |
-|                                    | vCPU \[cores\]      | 0.3     | 1     |
-|                                    | Mem \[GB\] limit    | 0.2     | 1     |
-| **Tasklist**                       |                     |         |       |
-| #importer                          | 1                   |         |       |
-|                                    | vCPU \[cores\]      | 0.3     | 1     |
-|                                    | Mem \[GB\] limit    | 0.2     | 1     |
-| #webapp                            | 2                   |         |       |
-|                                    | vCPU \[cores\]      | 0.3     | 1     |
-|                                    | Mem \[GB\] limit    | 0.2     | 2     |
-| **Optimize**                       |                     |         |       |
-| #importer                          | 1                   |         |       |
-|                                    | vCPU \[cores\]      | 0.3     | 1     |
-|                                    | Mem \[GB\] limit    | 0.4     | 1     |
-| #webapp                            | 2                   |         |       |
-|                                    | vCPU \[cores\]      | 0.3     | 1     |
-|                                    | Mem \[GB\] limit    | 0.4     | 1     |
-| **Elastic**                        |                     |         |       |
-| #statefulset                       | 1                   |         |       |
-|                                    | vCPU \[cores\]      | 1       | 2     |
-|                                    | Mem \[GB\] limit    | 3       | 6     |
-|                                    | Disk \[GB\] request | 64      | 100   |
-| **Connectors**                     |                     |         |       |
-| #                                  | 1                   |         |       |
-|                                    | vCPU \[cores\]      | 0.2     | 0.4   |
-|                                    | Mem \[GB\] limit    | 0.25    | 0.5   |
-| **Other** (Worker, Analytics, ...) |                     |         |       |
-| #                                  | 1                   |         |       |
-|                                    | vCPU \[cores\]      | 0.4     | 0.4   |
-|                                    | Mem \[GB\] limit    | 0.45    | 0.45  |
+In an isolated benchmark that changed only this setting for the same workload:
 
-## Planning non-production environments
+- Optimize's share of total Elasticsearch disk usage dropped from 62.8% to 7.6%, a reduction by a factor of 8.3.
+- Total secondary storage per created process instance dropped from 6.34 MB to 2.97 MB, a reduction by a factor of 2.13. This reduction was smaller because the setting does not affect Zeebe or Camunda Exporter storage.
 
-All clusters can be used for development, testing, integration, Q&A, and production. In Camunda 8 SaaS, production and test environments are organized via separate organizations within Camunda 8 to ease the management of clusters, while also minimizing the risk to accidentally accessing a production cluster.
+See [Confirming Optimize's object variable flattening cost with a controlled A/B test](https://camunda.github.io/zeebe-chaos/2026/07/09/Optimize-Object-Variable-Flattening/) for the complete methodology and additional measurements.
 
-Note that functional unit tests that are written in Java and use [zeebe-process-test](https://github.com/camunda-cloud/zeebe-process-test/), will use an in-memory broker in unit tests, so no development cluster is needed for this use case.
+:::warning
+These ratios are specific to the benchmark's payload and process models; they are not universal constants. Object variable flattening processes nested JSON recursively without a depth limit, so payloads with deeper nesting or more object fields can require considerably more storage than measured here. Measure your workload before using these numbers for capacity planning.
+:::
 
-For typical integration or functional test environments, you can normally just deploy a small cluster, like the one shown above, even if your production environment is sized bigger. This is typically sufficient, as functional tests typically run much smaller workloads.
+##### Other mitigations
 
-Load or performance tests ideally run on the same sizing configuration as your production instance to yield reliable results.
+- **Run Optimize on a separate Elasticsearch/OpenSearch instance.** Contention is bidirectional: Optimize's write spikes degrade Operate, Tasklist, and the Camunda Exporter, while heavy exporter activity degrades Optimize import. Isolation removes this mutual interference.
+- **Tune retention periods.** Shorter retention means less data in Elasticsearch/OpenSearch and better performance.
+- **Increase import throughput if Optimize lags.** If you notice a significant lag between the rate of exported Zeebe records and imported Optimize data, raise `CAMUNDA_OPTIMIZE_ZEEBE_MAX_IMPORT_PAGE_SIZE` so each import cycle fetches more exported records. This helps Optimize keep pace under high load, but increases memory use per fetch and can negatively impact individual record latency, as Optimize must wait to fill larger batches before processing.
 
-A typical customer set-up consists of:
+#### Elasticsearch/OpenSearch shard budget
 
-- 1 Production cluster
-- 1 Integration or pre-prod cluster (equal in size to your anticipated production cluster if you want to run load tests or benchmarks)
-- 1 Test cluster
-- Multiple developer clusters
+:::warning
+Optimize creates a dedicated index per deployed process definition, each using at least one shard. Elasticsearch and OpenSearch cap the number of shards per node (1,000 by default), so a cluster's total shard budget is `nodes × per-node limit` (for example, 3,000 on a three-node cluster). A large or growing number of deployed process definitions consumes this budget and can approach the ceiling; small development or test clusters with few nodes reach it quickly. Once the ceiling is hit, new index creation is rejected, which cascades into exporter backpressure and stalled processing.
 
-Ideally, every active developer runs its own cluster, so that the workflow engine does not need to be shared amongst developers. Otherwise, clusters are not isolated, which can lead to errors if for example developer A deploys a new version of the same process as developer B. Typically, developer clusters can be deleted when they are no longer used, as no data needs to be kept, so you might not need one cluster per developer that works with Camunda 8 at some point in time. And using in-memory unit tests further reduces the contention on developer clusters.
+Account for shard budget when sizing the Elasticsearch/OpenSearch cluster, not just CPU, memory, and disk. See [impact of high process deployments on Elasticsearch](https://camunda.github.io/zeebe-chaos/2026/05/28/Impact-of-High-Process-Deployments-on-Elasticsearch).
+:::
 
-However, some customers do share a Camunda 8 cluster amongst various developers for economic reasons. This can work well if everybody is aware of the problems that can arise.
+#### Zeebe record ILM retention
 
-## Running experiments and benchmarks
+When the [Elasticsearch exporter retention policy](/self-managed/components/orchestration-cluster/zeebe/exporters/elasticsearch-exporter.md#retention) is enabled, Zeebe record indices are deleted after the configured `minimum-age`. Optimize reads from these same indices, so the retention window must be long enough to cover Optimize's worst-case import lag. If the exporter deletes records before Optimize imports them, process instance completion events are permanently lost: Optimize records the instance as `ACTIVE` with no `endDate`, and history cleanup can never remove it.
 
-If you are in doubt about which package to choose, you can do a load test with a representative workload with the target hardware package. This will help you decide if the specific package can serve your needs.
+**Minimum recommended retention:** Set `minimum-age` to at least **3 days** when running Optimize; **7 or more days** is recommended. This provides headroom for:
 
-This is recommended if you exceed the above numbers of three million process instances per day.
+- Import lag that grows as the Optimize process instance index grows larger.
+- Recovery time after Elasticsearch cluster events such as node restarts, rolling upgrades, and shard rebalancing.
 
-Take a look at the [Camunda 8 benchmark project](https://github.com/camunda-community-hub/camunda-8-benchmark) as a starting point for your own benchmarks.
+The default `minimum-age` of `30d` provides sufficient headroom. If you reduced it to limit disk usage, verify that the new value still exceeds your observed Optimize import lag before applying it to production.
+
+**Disk sizing:** A longer ILM retention window means Zeebe record indices are kept on disk longer before deletion. Factor the additional raw exporter index volume into your Elasticsearch disk budget when increasing `minimum-age` beyond the default.
+
+**Self-reinforcing failure mode:** As Optimize's process instance index grows, Elasticsearch write latency increases, which raises per-batch import lag. Higher import lag increases the probability of an ILM race on the next cluster event. This cycle compounds on long-lived clusters running at sustained load. To break it, increase ILM retention and reduce the Optimize index size through history cleanup or variable filtering.
+
+**Symptom:** If Optimize history cleanup runs on schedule but consistently completes in zero seconds against a large dataset, orphaned `ACTIVE` documents are likely accumulating. See [diagnosing stalled cleanup](/self-managed/components/optimize/configuration/history-cleanup.md#diagnosing-stalled-cleanup).
+
+The sizing guidance for [Self-Managed](./sizing-self-managed.md#baseline-resource-configuration) provides configurations with and without Optimize to help you plan accordingly.
+
+### Latency and cycle time
+
+In some use cases, process cycle time (or even individual task cycle time) matters. For example, you might expose a REST endpoint that starts a process instance to calculate a customer score. The process runs four service tasks, and the REST request must return synchronously within 250 ms.
+
+While service-task duration depends on the work performed, you can measure the workflow engine’s own overhead.
+
+<!-- TODO: Replace the following latency measurements with current 8.8/8.9 benchmark data. The old measurements (Camunda 8 1.2.4: ~10 ms/node, ~50 ms remote worker latency) are outdated. -->
+
+:::note
+The latency measurements below are approximate and were last validated against an earlier version of Camunda 8. Updated measurements for 8.8/8.9 are pending. With the 8.8 streamlined architecture and properly aligned resources (3.5 CPU cores per broker), latency is expected to improve by approximately 2x compared to the previous distributed deployment.
+
+Actual latency is highly environment-dependent — factors like network latency between workers and the cluster, disk I/O speed (commit latency), and cloud region placement significantly affect these numbers.
+:::
+
+As a rough estimate, you can expect:
+
+- Single-digit millisecond processing time per process node.
+- Approximately 50 ms latency to process service tasks in remote workers when running worker code in the same cloud region as the Camunda cluster.
+
+Hence, executing four service tasks results in roughly 200-250 ms workflow engine overhead.
+
+As you push throughput toward the cluster’s limits, latency increases because requests compete for resources, especially disk writes. If cycle time and latency matter, leave enough headroom and avoid running the cluster near full utilization to prevent resource contention.
+
+:::tip
+A good rule of thumb is to size for about **20x your average load**. This gives you capacity for peaks and keeps latency low during normal operation.
+:::
+
+| Indicator                                                      |    Number | Calculation method | Notes                                                                                      |
+| :------------------------------------------------------------- | --------: | :----------------: | :----------------------------------------------------------------------------------------- |
+| Onboarding instances per year                                  | 5,000,000 |                    | Business input.                                                                            |
+| Expected process instances on peak day                         |   150,000 |                    | Business input.                                                                            |
+| Process instances per second within business hours on peak day |      5.20 |   / (8\*60\*60)    | Only looking at the seconds within the eight business hours of a day.                      |
+| Process instances per second including buffer                  |    104.16 |       \* 20        | Adding some buffer is recommended for critical, high-performance or low-latency use cases. |
+
+### Payload size
+
+Each process instance can hold a payload, known as [process variables](/components/concepts/variables.md). The workflow engine must manage the variables for all running instances, and data from both running and completed process instances is forwarded to Operate and Tasklist.
+
+Process variable size affects resource requirements. For example, there’s a big difference between storing a few strings (around 1 KB) and storing a full 1 MB JSON document. That’s why payload size is a key sizing factor.
+
+Camunda's official benchmarks use two reference payloads:
+
+- [**Typical payload**](https://github.com/camunda/camunda/blob/main/load-tests/load-tester/src/main/resources/bpmn/typical_payload.json): Used for baseline measurements (~0.5 KB, 15 simple variables).
+- [**Realistic payload**](https://github.com/camunda/camunda/blob/main/load-tests/load-tester/src/main/resources/bpmn/realistic/realisticPayload.json): Used for the reference sizing benchmarks. This better represents real-world payloads (~11 KB).
+
+:::note
+Payload size has a multiplicative effect, affecting Zeebe storage, Elasticsearch export volume, Optimize import time, and query/report performance. An 11 KB payload vs. a 0.5 KB payload can change disk consumption by **10-20x**.
+:::
+
+Consider these general rules for payload size:
+
+- The maximum [variable size per process instance is limited](/components/concepts/variables.md#variable-size-limitation), currently to roughly three MB.
+- Camunda does not recommend storing large amounts of data in your process context. Refer to our [best practices on handling data in processes](/components/best-practices/development/handling-data-in-processes.md) for more details.
+- An AI agent's [agent context](/components/agentic-orchestration/agent-definitions-and-instances.md#agent-context-and-memory) is a process variable that grows with each loop iteration, so it counts toward this limit. Switch the agent's memory to [Camunda document storage](/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-subprocess.md#choose-a-memory-storage-backend) when a long conversation would outgrow it.
+- Each [partition](/components/zeebe/technical-concepts/partitions.md) of the Zeebe installation can typically handle up to one GB of payload in total. Larger payloads can lead to slower processing. For example,
+  one million process instances with four KB each is about 3.9 GB, so you need at least four partitions. In practice, you’d typically use six partitions, since the number of partitions is usually a multiple of the replication factor (three by default).
+
+### Peak loads
+
+In most scenarios, your load will be volatile rather than constant. For example, your company might start 90% of its monthly process instances on a single day of the month. The **ability to handle those peaks is the more crucial requirement and should drive your decision**, rather than the average load.
+
+In this example, that single peak day defines your overall throughput requirements.
+
+In addition, sizing for peaks may mean you shouldn’t assume a full 24-hour day. Instead, you might size for just the eight business hours, or even the busiest two hours—depending on your workload.
+
+### Job worker capacity
+
+Even when your cluster has spare throughput capacity, an undersized job worker can still allow jobs to accumulate in the backlog. Worker capacity requires its own sizing exercise, separate from cluster sizing.
+
+The workflow engine delivers jobs to workers through two paths that share a worker's capacity but behave differently: [Job streaming pushes a job as soon as it becomes available for activation](/components/concepts/job-workers.md#how-job-streaming-and-polling-deliver-jobs), while polling is the only path that drains jobs already queued in the backlog.
+
+Therefore, healthy throughput does not indicate whether the backlog is draining; they are independent signals. The backlog can continue to grow after workers recover from an outage, even when throughput appears to have fully recovered. See [impact of worker downtime on a realistic load test](https://camunda.github.io/zeebe-chaos/2026/08/06/worker-downtime-throughput-recovery) for more details.
+
+:::note
+There is currently no built-in metric that directly reports the size of this backlog.
+:::
+
+Size the worker’s capacity according to its concurrency model and the job timeout. For the Java client’s fixed-thread-pool model, see [sizing `maxJobsActive` against execution threads](/components/best-practices/development/writing-good-workers.md#size-maxjobsactive-against-execution-threads). Other client SDKs implement worker capacity differently and are not covered by this formula.
+
+### Secondary storage
+
+Starting with Camunda 8.9, the platform supports three secondary storage backends, each with different sizing implications.
+
+#### Elasticsearch (default)
+
+- The **most mature and most benchmarked** option.
+- Required if you use Optimize.
+- Provides full-text search capabilities used by Operate and Tasklist.
+
+:::important
+Sizing data provided throughout this guide assumes Elasticsearch unless stated otherwise.
+:::
+
+#### OpenSearch
+
+- A drop-in alternative to Elasticsearch with a similar resource profile.
+- Supported for all components including Optimize. See [supported environments](/reference/supported-environments.md) for more details.
+- Sizing recommendations for Elasticsearch generally apply to OpenSearch as well.
+
+#### RDBMS
+
+- A different storage paradigm: a relational database instead of a document store. See the full list of [supported databases](/self-managed/concepts/databases/relational-db/rdbms-support-policy.md#supported-rdbms).
+- A different resource profile: CPU/memory-oriented rather than disk/IOPS-oriented.
+- Write throughput is approximately **70% of Elasticsearch** on equivalent hardware.
+- **No Optimize support**: If you need Optimize, you must run Elasticsearch alongside RDBMS.
+- **Scales primarily vertically** rather than horizontally like Elasticsearch. Plan initial sizing with more headroom, as adding capacity is more disruptive.
+- Ideal for organizations that already operate a supported RDBMS at scale and want to avoid adding Elasticsearch to their infrastructure.
+  <!-- To be validated - Potentially lower total disk space required for the same data volume (preliminary benchmarks suggest this, but detailed results are still being validated). -->
+  <!-- TODO: Link to RDBMS benchmark results page once PR #8159 is merged -->
+
+### Throughput
+
+Throughput defines how many process instances can be executed within a certain timeframe.
+
+It is typically easy to estimate the number of process instances per day you need to execute.
+However, hardware sizing depends more on the **number of BPMN tasks** in a process model. If you already know your future process model, you can use it to count the number of tasks in the process. For example, the following onboarding process contains five service tasks in a typical execution:
+
+<div bpmn="best-practices/sizing-your-environment-assets/customer_onboarding.bpmn" callouts="task1,task2,task3,task4,task5" />
+
+:::tip
+If you don't yet know the number of service tasks, Camunda recommends assuming **10 service tasks** as a rule of thumb.
+:::
+
+The number of tasks per process allows you to calculate the number of tasks per day. You can also convert this to tasks per second. For example:
+
+| Indicator                          |    Number | Calculation method | Notes                                        |
+| :--------------------------------- | --------: | :----------------: | :------------------------------------------- |
+| Onboarding instances per year      | 5,000,000 |                    | Business input.                              |
+| Process instances per business day |    20,000 |       / 250        | Average number of working days in a year.    |
+| Tasks per day                      |   100,000 |        \* 5        | Tasks in the process model as counted above. |
+| Tasks per second                   |      1.16 |   / (24\*60\*60)   | Seconds per day.                             |
+
+In most cases, Camunda defines throughput per day, as this time frame is easier to understand. However, in high-performance use cases, you might need to define the throughput per second.
+
+## Plan non-production environments
+
+All clusters can be used for development, testing, integration, Q&A, and production.
+
+For typical integration or functional test environments, you can usually deploy a small cluster even if your production environment is sized larger. This is typically sufficient, as functional tests run much smaller workloads.
+
+Load or performance tests should ideally run on the same sizing configuration as your production cluster to yield reliable results.
+
+A typical customer setup consists of:
+
+- A production cluster.
+- An integration or pre-production cluster (equal in size to your anticipated production cluster if you want to run load tests or benchmarks).
+- A test cluster.
+- Development clusters.
+
+## Next steps
+
+Now that you understand the factors that influence sizing:
+
+- **SaaS customers:** [Size your SaaS cluster](sizing-saas.md) to select the right cluster size.
+- **Self-Managed admins:** Provision your Kubernetes cluster using these [baseline resource settings](sizing-self-managed.md).
+- **Validate sizing:** [Run your own benchmarks](sizing-benchmarks.md) to test your specific workload.
+
+For current secondary storage benchmarks, see [RDBMS benchmark results](/self-managed/concepts/secondary-storage/rdbms-benchmark-results.md).

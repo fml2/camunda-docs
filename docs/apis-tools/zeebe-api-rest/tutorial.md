@@ -8,8 +8,8 @@ In this tutorial, we'll step through examples to highlight the capabilities of t
 
 ## Prerequisites
 
-- If you haven't done so already, [create a cluster](/guides/create-cluster.md).
-- Upon cluster creation, [create your first client](/guides/setup-client-connection-credentials.md). Ensure you check the `Zeebe` client scope box.
+- If you haven't done so already, [create a cluster](/components/hub/organization/manage-clusters/create-cluster.md).
+- Upon cluster creation, [create your first client](/components/hub/organization/manage-clusters/manage-api-clients.md#create-a-client). Ensure you check the `Zeebe` client scope box.
 
 :::note
 Make sure you keep the generated client credentials in a safe place. The **Client secret** will not be shown again. For your convenience, you can also download the client information to your computer.
@@ -20,7 +20,7 @@ Make sure you keep the generated client credentials in a safe place. The **Clien
 
 ## Getting started
 
-- You need authentication to access the API endpoints. Find more information [here](./zeebe-api-rest-authentication.md).
+- You need authentication to access the API endpoints. See [Zeebe REST API authentication](./zeebe-api-rest-authentication.md).
 
 ## Set up authentication
 
@@ -41,7 +41,7 @@ In this tutorial, we will execute arguments to assign and unassign a user to and
 ## Assign a Zeebe user task (POST)
 
 :::note
-In this tutorial, you will capture a **Zeebe user task** ID to assign and unassign users in this API. Camunda 8.5 introduced this new [user task](/components/modeler/bpmn/user-tasks/user-tasks.md) implementation type, and these Zeebe user tasks are different from job worker-based user tasks. See more details on task type differences in the [migrating to Zeebe user tasks documentation](/apis-tools/tasklist-api-rest/migrate-to-zeebe-user-tasks.md#task-type-differences).
+In this tutorial, you will capture a **Zeebe user task** ID to assign and unassign users in this API. Camunda 8.5 introduced this new [user task](/components/modeler/bpmn/user-tasks/user-tasks.md) implementation type, and these Zeebe user tasks are different from job worker-based user tasks (which while still supported, are now deprecated with 8.6). See more details on task type differences in the [migrating to Zeebe user tasks documentation](/apis-tools/migration-manuals/migrate-to-camunda-user-tasks.md#task-type-differences).
 :::
 
 First, let's script an API call to assign a Zeebe user task.

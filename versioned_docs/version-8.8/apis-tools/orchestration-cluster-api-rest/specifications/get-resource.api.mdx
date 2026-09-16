@@ -1,0 +1,353 @@
+---
+id: get-resource
+title: "Get resource"
+description: "<MarkerStronglyConsistentExtension />"
+sidebar_label: "Get resource"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "get api-method"
+info_path: versioned_docs/version-8.8/apis-tools/orchestration-cluster-api-rest/specifications/orchestration-cluster-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MarkerStronglyConsistentExtension from "@site/src/mdx/MarkerStronglyConsistentExtension";
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get resource"}
+></Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/resources/{resourceKey}"}
+  context={"endpoint"}
+></MethodEndpoint>
+
+<MarkerStronglyConsistentExtension />
+
+Returns a deployed resource.
+:::info
+Currently, this endpoint only supports RPA resources.
+:::
+
+<Heading id={"request"} as={"h2"} className={"openapi-tabs__heading"}>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails
+  parameters={[
+    {
+      name: "resourceKey",
+      in: "path",
+      required: true,
+      description: "The unique key identifying the resource.",
+      schema: {
+        type: "string",
+        oneOf: [
+          {
+            description:
+              "System-generated key for a deployed process definition.",
+            format: "ProcessDefinitionKey",
+            example: "2251799813686749",
+            type: "string",
+            allOf: [
+              {
+                description:
+                  "Zeebe Engine resource key (Java long serialized as string)",
+                type: "string",
+                title: "LongKey",
+              },
+            ],
+            title: "ProcessDefinitionKey",
+          },
+          {
+            allOf: [
+              {
+                description:
+                  "Zeebe Engine resource key (Java long serialized as string)",
+                type: "string",
+                title: "LongKey",
+              },
+            ],
+            description:
+              "System-generated key for a deployed decision requirements definition.",
+            format: "DecisionRequirementsKey",
+            example: "2251799813683346",
+            type: "string",
+            title: "DecisionRequirementsKey",
+          },
+          {
+            description: "System-generated key for a deployed form.",
+            format: "FormKey",
+            example: "2251799813684365",
+            type: "string",
+            allOf: [
+              {
+                description:
+                  "Zeebe Engine resource key (Java long serialized as string)",
+                type: "string",
+                title: "LongKey",
+              },
+            ],
+            title: "FormKey",
+          },
+          {
+            description: "System-generated key for a decision definition.",
+            format: "DecisionDefinitionKey",
+            example: "2251799813326547",
+            type: "string",
+            allOf: [
+              {
+                description:
+                  "Zeebe Engine resource key (Java long serialized as string)",
+                type: "string",
+                title: "LongKey",
+              },
+            ],
+            title: "DecisionDefinitionKey",
+          },
+        ],
+        description: "The system-assigned key for this resource.",
+        format: "ResourceKey",
+        title: "ResourceKey",
+      },
+    },
+  ]}
+></ParamsDetails>
+
+<RequestSchema title={"Body"} body={undefined}></RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{
+    "200": {
+      description: "The resource is successfully returned.",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              resourceName: {
+                description:
+                  "The resource name from which this resource was parsed.",
+                type: "string",
+              },
+              version: {
+                description: "The assigned resource version.",
+                type: "integer",
+                format: "int32",
+              },
+              versionTag: {
+                description: "The version tag of this resource.",
+                type: "string",
+              },
+              resourceId: {
+                description: "The resource ID of this resource.",
+                type: "string",
+              },
+              tenantId: {
+                description: "The tenant ID of this resource.",
+                allOf: [
+                  {
+                    example: "customer-service",
+                    description: "The unique identifier of the tenant.",
+                    format: "TenantId",
+                    type: "string",
+                    title: "TenantId",
+                  },
+                ],
+              },
+              resourceKey: {
+                allOf: [
+                  {
+                    type: "string",
+                    oneOf: [
+                      {
+                        description:
+                          "System-generated key for a deployed process definition.",
+                        format: "ProcessDefinitionKey",
+                        example: "2251799813686749",
+                        type: "string",
+                        allOf: [
+                          {
+                            description:
+                              "Zeebe Engine resource key (Java long serialized as string)",
+                            type: "string",
+                            title: "LongKey",
+                          },
+                        ],
+                        title: "ProcessDefinitionKey",
+                      },
+                      {
+                        allOf: [
+                          {
+                            description:
+                              "Zeebe Engine resource key (Java long serialized as string)",
+                            type: "string",
+                            title: "LongKey",
+                          },
+                        ],
+                        description:
+                          "System-generated key for a deployed decision requirements definition.",
+                        format: "DecisionRequirementsKey",
+                        example: "2251799813683346",
+                        type: "string",
+                        title: "DecisionRequirementsKey",
+                      },
+                      {
+                        description:
+                          "System-generated key for a deployed form.",
+                        format: "FormKey",
+                        example: "2251799813684365",
+                        type: "string",
+                        allOf: [
+                          {
+                            description:
+                              "Zeebe Engine resource key (Java long serialized as string)",
+                            type: "string",
+                            title: "LongKey",
+                          },
+                        ],
+                        title: "FormKey",
+                      },
+                      {
+                        description:
+                          "System-generated key for a decision definition.",
+                        format: "DecisionDefinitionKey",
+                        example: "2251799813326547",
+                        type: "string",
+                        allOf: [
+                          {
+                            description:
+                              "Zeebe Engine resource key (Java long serialized as string)",
+                            type: "string",
+                            title: "LongKey",
+                          },
+                        ],
+                        title: "DecisionDefinitionKey",
+                      },
+                    ],
+                    description: "The system-assigned key for this resource.",
+                    format: "ResourceKey",
+                    title: "ResourceKey",
+                  },
+                ],
+                description: "The unique key of this resource.",
+              },
+            },
+            title: "ResourceResult",
+          },
+        },
+      },
+    },
+    "404": {
+      description: "A resource with the given key was not found.",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+    "500": {
+      description: "An internal error occurred while processing the request.\n",
+      content: {
+        "application/problem+json": {
+          schema: {
+            description:
+              "A Problem detail object as described in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457). There may be additional properties specific to the problem type.\n",
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                format: "uri",
+                description: "A URI identifying the problem type.",
+                default: "about:blank",
+                example: "about:blank",
+              },
+              title: {
+                type: "string",
+                description: "A summary of the problem type.",
+                example: "Bad Request",
+              },
+              status: {
+                type: "integer",
+                format: "int32",
+                description: "The HTTP status code for this problem.",
+                example: 400,
+                minimum: 400,
+                maximum: 600,
+              },
+              detail: {
+                type: "string",
+                description: "An explanation of the problem in more detail.",
+                example:
+                  "Request property [maxJobsToActivates] cannot be parsed",
+              },
+              instance: {
+                type: "string",
+                format: "uri",
+                description:
+                  "A URI path identifying the origin of the problem.",
+                example: "/v2/jobs/activation",
+              },
+            },
+            title: "ProblemDetail",
+          },
+        },
+      },
+    },
+  }}
+></StatusCodes>

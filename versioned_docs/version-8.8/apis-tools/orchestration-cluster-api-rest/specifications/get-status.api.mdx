@@ -1,0 +1,59 @@
+---
+id: get-status
+title: "Get cluster status"
+description: "<MarkerStronglyConsistentExtension />"
+sidebar_label: "Get cluster status"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVWFv4kYQ/SvT7YeAZGxybaXIucuV89EobUqiQBpVgKJlPeBV7F3f7prEsvzfq107BHJwd/nWTwbPaN6892bGFTF0pUk4JVFaaIOKzD0ic1TUcCkuYhKSFZqxoabQxCMxaqZ4bmMkJDMxE9NpdDUaX4wnw1H0bzie3FyNzudzG4kSZA8aTIKQIE1NAtqVAbl0L1kDCIsS1qj4suRiBdzFFB5poAZSpNqAFAg5VYZbWHjkJgHalixtSozKJx5RqHMpNGoSVuRd/1f72O13soXKNdxeAxUxJPStWLVHfuv/8t36n6/uRg4hlqhBSAMJXSNQUf4ARO2RDE0iWweIR3JqEhKSQD+boVGtUVnzKlKolISk0izBjNZhEFSJ1KYOq1wqUwfrd8Qja6o4XaSNQDbcMFjSIjUkJKlkNHWvX/tsedmAoBk+u3elWILaNHMC7fDAzXA8gXNq8JGWTicLvwtz0j/p70WwqT9QfXB9AQ1zB9Aw3oVIjMn3QjTJbwWp67kVmxWKm3JsSzQSfkKqUA0Ka0tFTJnjC7ZDsv8XLol47Y8/pMqo7fHPu4ltf0E1Z98rYXPcRHCxlC6Rm9RG9jMYXF9Yt1HphnnfPyYeYVIYypwZ1kcSkohmhYgpDMWKC0TFxYp47STZHnQYBCtukmLhM5kFrEnfPLnWBWpLYldoq91SKmAyywrBGTV2sds5f8Y8eV4Uu7kpZyg07mntsonAPw0ZOPb7b2lxkcpFkFEughZCB9Hg79vR50Hv8iIajsbD3rHf982TcfLmUpuMiq0+ztFsNlrvPYKVExaF+d/dw3aaDD6ZIE8pF9YqJ13V3pIpaTnNvfYeTElVLajGW5XWtX39pUBVknA6fzkf9t/2dTofukl+6jEZ45hmubsw04qkVKzs4pU5jp1g1mq6QGve+PNfdsRloZhtkmdu+ytgCqnB1v4o5SgM1LBUMoOj31tbTwK5Pfe9VrgezfnRqVWa6lIwWBaCOYU2H7Dhk+uu04VqJgCYFNpAWxQ+7MPudF1BAPpI+SbX31TcxG0tmaKfylXnKHr5BrS2HNm8mtTeRpXr0iRSHFbEUW7x7nf43uv4AVrBdpq1ncS4tHzvG2PvccO4dwYjKTC0zQKwRtkP8IptQ+Y57r9UegnligvTmZGvSc5Id5th9PNhdoW2w92C+ztnzB/HD07UvFiknLkl4QwaTydUP8D5V37ORNU019RdU3WAoR85jze2bYxtopvKA4vmsmxO1Jp7p7jBSy7wEP3XJt8U+htDX2g87HAY7jS+PdcCtn2xzt6gLlLzvtP14JN8eh+XArSJwxCVkioMh/ZxdgatSCmaA/KEoR27exTrTvfj6TeGwXeyfTzdGolU/NSZ7TmYIcRSYCNOk3710Ol0u06qef0fwGWg/Q==
+sidebar_class_name: "get api-method"
+info_path: versioned_docs/version-8.8/apis-tools/orchestration-cluster-api-rest/specifications/orchestration-cluster-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MarkerStronglyConsistentExtension from "@site/src/mdx/MarkerStronglyConsistentExtension";
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get cluster status"}
+></Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/status"}
+  context={"endpoint"}
+></MethodEndpoint>
+
+<MarkerStronglyConsistentExtension />
+
+Checks the health status of the cluster by verifying if there's at least one partition with a healthy leader.
+
+<ParamsDetails parameters={undefined}></ParamsDetails>
+
+<RequestSchema title={"Body"} body={undefined}></RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{
+    "204": {
+      description:
+        "The cluster is UP and has at least one partition with a healthy leader.",
+    },
+    "503": {
+      description:
+        "The cluster is DOWN and does not have any partition with a healthy leader.",
+    },
+  }}
+></StatusCodes>
